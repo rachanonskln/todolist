@@ -1,0 +1,34 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# On render.com: New -> Blueprint -> pick this repo -> Render reads this file
+# and creates the service below automatically. Secrets marked `sync: false`
+# are left blank for you to fill in from the Render dashboard after creation
+# (never committed here).
+services:
+  - type: web
+    name: rachanon-blns-task-backend
+    runtime: node
+    plan: free
+    rootDir: To do list/app/backend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NOTION_API_KEY
+        sync: false
+      - key: NOTION_TASKS_DB_ID
+        sync: false
+      - key: NOTION_CATEGORIES_DB_ID
+        sync: false
+      - key: NOTION_USERS_DB_ID
+        sync: false
+      - key: NOTION_LOGS_DB_ID
+        sync: false
+      - key: LINE_CHANNEL_ACCESS_TOKEN
+        sync: false
+      - key: LINE_CHANNEL_SECRET
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: INTERNAL_API_KEY
+        generateValue: true
+      - key: AI_MODULE_URL
+        value: http://localhost:8000
