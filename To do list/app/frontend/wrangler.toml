@@ -1,8 +1,13 @@
-# Cloudflare Pages project config for the frontend static build.
-# Manual deploy (once `wrangler login` is done locally):
-#   npm run build && npx wrangler pages deploy dist --project-name=aurora-tasks
-# Automated deploy: see ../../.github/workflows/deploy-frontend.yml, which
-# runs this same build + deploy on every push to main via GitHub Actions.
-name = "aurora-tasks"
-pages_build_output_dir = "dist"
+# Deployed as a Cloudflare Worker serving static assets (not the classic
+# separate "Pages" product) — this project is git-connected directly in the
+# Cloudflare dashboard (Workers & Pages > todolist > Settings > Build), which
+# builds and runs `npx wrangler deploy` on every push automatically. `name`
+# must match the project name shown there exactly.
+name = "todolist"
 compatibility_date = "2026-01-01"
+
+[assets]
+directory = "dist"
+# React Router uses client-side routing, so unknown paths (e.g. /calendar on
+# a hard refresh) must fall back to index.html instead of 404ing.
+not_found_handling = "single-page-application"

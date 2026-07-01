@@ -75,28 +75,29 @@ npx tsx scheduler/local-dev-cron.ts
 
 | Component      | Suggested target                              | Notes |
 |-----------------|------------------------------------------------|-------|
-| Frontend        | Cloudflare Pages (static build)                 | `npm run build` outputs a static `dist/`; see below |
+| Frontend        | Cloudflare Workers (static assets)              | `npm run build` outputs a static `dist/`; see below |
 | Backend         | Cloud Run / ECS Fargate (Docker) or Cloud Functions | Stateless — scales to zero between requests |
 | AI module       | Cloud Run (Docker) — separate service from backend | Isolate LLM/API-quota blast radius from the user-facing API |
 | Notion          | Managed by Notion — no deployment needed        | Rate limits (~3 req/s) matter at scale; add a cache layer if needed |
 | Scheduler       | Cloud Scheduler (see `scheduler/cloud-scheduler.tf`) | Or AWS EventBridge Scheduler equivalent |
 
-### Deploying the frontend to Cloudflare Pages
+### Deploying the frontend (Cloudflare Workers, static assets)
 
-Config is already in place (`frontend/wrangler.toml` + `.github/workflows/deploy-frontend.yml`
-at the repo root); it's not wired to a live Cloudflare account yet. To activate it:
+Live at Cloudflare dashboard → Workers & Pages → **todolist**, git-connected to
+`rachanonskln/todolist` — every push to `main` triggers a build + `npx wrangler deploy`
+on Cloudflare's own infrastructure (Settings → Build). No GitHub Actions involved; keep
+`frontend/wrangler.toml`'s `name` in sync with the project name shown there. Build
+settings on the Cloudflare side:
 
-1. Create a Cloudflare Pages project named `aurora-tasks` (or edit `projectName` in the
-   workflow to match an existing one) — via the Cloudflare dashboard or
-   `npx wrangler pages project create aurora-tasks`.
-2. In the GitHub repo, add under **Settings → Secrets and variables → Actions**:
-   - Secret `CLOUDFLARE_API_TOKEN` — a token scoped to "Cloudflare Pages: Edit"
-   - Secret `CLOUDFLARE_ACCOUNT_ID` — from the Cloudflare dashboard sidebar
-   - Variable `VITE_API_BASE_URL` — the deployed backend's URL + `/api`, once the
-     backend has a public URL (e.g. a Cloud Run URL). Leave unset until then; the
-     build falls back to `/api`, which only works if frontend and backend share an origin.
-3. Push to `main` — the workflow builds `frontend/` and deploys `dist/` automatically.
-   Manual alternative: `wrangler login`, then `cd frontend && npm run build && npx wrangler pages deploy dist --project-name=aurora-tasks`.
+| Setting | Value |
+|---|---|
+| Root directory | `To do list/app/frontend` |
+| Build command | `npm install && npm run build` |
+| Deploy command | `npx wrangler deploy` |
+
+If the backend later gets a public URL (e.g. a Cloud Run URL), set `VITE_API_BASE_URL`
+as a build variable on the Cloudflare project (Settings → Build → Variables and secrets)
+so the frontend stops assuming same-origin `/api`.
 
 The backend and AI module aren't on Cloudflare — Express and FastAPI don't run natively
 on Workers' runtime, so they stay on Cloud Run (or equivalent) as described above.
