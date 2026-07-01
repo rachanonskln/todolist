@@ -2,7 +2,15 @@ import { HTMLAttributes } from "react";
 import clsx from "clsx";
 import { motion } from "framer-motion";
 
-interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
+// framer-motion's <motion.div> redefines onDrag/onDragStart/onDragEnd and the
+// animation event handlers with signatures that conflict with React's native
+// HTMLAttributes — omit them here since GlassCard doesn't accept them anyway.
+type DivPropsCompatibleWithMotion = Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "onDrag" | "onDragStart" | "onDragEnd" | "onAnimationStart" | "onAnimationEnd"
+>;
+
+interface GlassCardProps extends DivPropsCompatibleWithMotion {
   accent?: "pink" | "peach" | "lemon" | "mint" | "sky" | "lavender" | "lilac";
 }
 

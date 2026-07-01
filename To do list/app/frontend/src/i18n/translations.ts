@@ -1,4 +1,65 @@
-export const translations = {
+export interface TranslationShape {
+  nav: {
+    dashboard: string;
+    calendar: string;
+    newTask: string;
+    settings: string;
+    brand: string;
+  };
+  navbar: {
+    greeting: string;
+    subtitle: string;
+  };
+  dashboard: {
+    today: string;
+    pending: string;
+    completed: string;
+    highPriority: string;
+    todaysTasks: string;
+    noTasksToday: string;
+  };
+  priority: { low: string; medium: string; high: string };
+  status: { pending: string; in_progress: string; completed: string };
+  calendar: {
+    selectDay: string;
+    noTasksThisDay: string;
+    weekdays: string[];
+  };
+  taskForm: {
+    newTitle: string;
+    editTitle: string;
+    title: string;
+    titlePlaceholder: string;
+    description: string;
+    start: string;
+    end: string;
+    priority: string;
+    status: string;
+    category: string;
+    uncategorized: string;
+    remindBefore: string;
+    cancel: string;
+    save: string;
+    saving: string;
+  };
+  settings: {
+    integrations: string;
+    notionApiKey: string;
+    lineToken: string;
+    lineTokenPlaceholder: string;
+    emailMonitoring: string;
+    connected: string;
+    notConnected: string;
+    connectGmail: string;
+    disconnect: string;
+    save: string;
+    saved: string;
+  };
+}
+
+export type Locale = "en" | "th";
+
+export const translations: Record<Locale, TranslationShape> = {
   en: {
     nav: {
       dashboard: "Dashboard",
@@ -115,7 +176,4 @@ export const translations = {
       saved: "บันทึกแล้ว ✓",
     },
   },
-} as const;
-
-export type Locale = keyof typeof translations;
-export type TranslationShape = typeof translations.en;
+};
