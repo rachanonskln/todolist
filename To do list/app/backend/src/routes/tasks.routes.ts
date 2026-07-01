@@ -1,8 +1,22 @@
 import { Router } from "express";
 import { z } from "zod";
-import { TasksRepository, LogsRepository } from "../services/notionService.js";
+import { TasksRepository, LogsRepository, type TaskRecord } from "../services/notionService.js";
+import { upsertEventForTask, deleteEventForTask } from "../services/googleCalendarService.js";
 
 export const tasksRouter = Router();
+
+/** Mirrors a task to Google Calendar and persists the returned event id.
+ * Skips tasks still pending AI review — an unconfirmed, possibly-wrong
+ * AI suggestion shouldn't show up on the user's real calendar until they
+ * approve it (see internal.routes.ts). No-ops if Calendar isn't configured. */
+async function syncToCalendar(task: TaskRecord): Promise<TaskRecord> {
+  if (task.needsReview) return task;
+  const eventId = await upsertEventForTask(task);
+  if (eventId && eventId !== task.googleEventId) {
+    return TasksRepository.update(task.id, { googleEventId: eventId });
+  }
+  return task;
+}
 
 const taskInputSchema = z.object({
   title: z.string().min(1),
@@ -58,12 +72,13 @@ tasksRouter.get("/:id", async (req, res, next) => {
 tasksRouter.post("/", async (req, res, next) => {
   try {
     const input = taskInputSchema.parse(req.body);
-    const task = await TasksRepository.create(input);
+    let task = await TasksRepository.create(input);
     await LogsRepository.record({
       source: "system",
       message: `Task created: ${task.title}`,
       relatedTaskId: task.id,
     });
+    task = await syncToCalendar(task);
     res.status(201).json(task);
   } catch (err) {
     next(err);
@@ -73,7 +88,8 @@ tasksRouter.post("/", async (req, res, next) => {
 tasksRouter.patch("/:id", async (req, res, next) => {
   try {
     const input = taskInputSchema.partial().parse(req.body);
-    const task = await TasksRepository.update(req.params.id, input);
+    let task = await TasksRepository.update(req.params.id, input);
+    task = await syncToCalendar(task);
     res.json(task);
   } catch (err) {
     next(err);
@@ -82,6 +98,8 @@ tasksRouter.patch("/:id", async (req, res, next) => {
 
 tasksRouter.delete("/:id", async (req, res, next) => {
   try {
+    const task = await TasksRepository.get(req.params.id);
+    await deleteEventForTask(task.googleEventId);
     await TasksRepository.remove(req.params.id);
     res.status(204).end();
   } catch (err) {

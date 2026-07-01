@@ -22,6 +22,10 @@ export interface TaskRecord {
    * haven't been confirmed by the user yet — see internal.routes.ts. */
   needsReview: boolean;
   reminderMinutesBefore: number;
+  /** Id of the mirrored Google Calendar event, if Calendar sync is
+   * configured — lets updates/deletes target the right event instead of
+   * creating duplicates. */
+  googleEventId?: string;
 }
 
 export interface TaskInput {
@@ -36,6 +40,7 @@ export interface TaskInput {
   assignee?: string;
   needsReview?: boolean;
   reminderMinutesBefore?: number;
+  googleEventId?: string;
 }
 
 /** Maps a raw Notion page into the flat shape the rest of the app uses. */
@@ -54,6 +59,7 @@ function mapPageToTask(page: PageObjectResponse): TaskRecord {
     assignee: p.Assignee?.rich_text?.[0]?.plain_text || undefined,
     needsReview: p.NeedsReview?.checkbox ?? false,
     reminderMinutesBefore: p.ReminderMinutesBefore?.number ?? 30,
+    googleEventId: p.GoogleEventId?.rich_text?.[0]?.plain_text || undefined,
   };
 }
 
@@ -88,6 +94,9 @@ function taskToProperties(input: Partial<TaskInput>) {
   }
   if (input.reminderMinutesBefore !== undefined) {
     props.ReminderMinutesBefore = { number: input.reminderMinutesBefore };
+  }
+  if (input.googleEventId !== undefined) {
+    props.GoogleEventId = { rich_text: [{ text: { content: input.googleEventId } }] };
   }
   return props;
 }

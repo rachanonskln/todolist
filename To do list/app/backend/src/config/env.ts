@@ -24,4 +24,13 @@ export const env = {
   jwtSecret: required("JWT_SECRET"),
   internalApiKey: required("INTERNAL_API_KEY"),
   aiModuleUrl: process.env.AI_MODULE_URL ?? "http://localhost:8000",
+  // Google Calendar sync is optional: until these are set (via the one-time
+  // OAuth flow in scripts/google-oauth-setup.ts), googleCalendarService
+  // no-ops instead of failing every task write.
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+    refreshToken: process.env.GOOGLE_REFRESH_TOKEN ?? "",
+    calendarId: process.env.GOOGLE_CALENDAR_ID ?? "primary",
+  },
 };
