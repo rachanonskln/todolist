@@ -222,10 +222,30 @@ export interface UserRecord {
   id: string;
   email: string;
   passwordHash: string;
+  name?: string;
+  avatarUrl?: string;
   lineUserId?: string;
   notionApiKey?: string;
   lineChannelAccessToken?: string;
   emailIntegrationStatus: "connected" | "disconnected";
+}
+
+// Notion caps each rich_text run at 2000 characters, so a data-URL avatar
+// (easily 10-20k chars) has to be split across multiple runs on write and
+// rejoined on read.
+const RICH_TEXT_CHUNK_SIZE = 1900;
+
+function chunkRichText(value: string) {
+  const chunks: string[] = [];
+  for (let i = 0; i < value.length; i += RICH_TEXT_CHUNK_SIZE) {
+    chunks.push(value.slice(i, i + RICH_TEXT_CHUNK_SIZE));
+  }
+  return chunks.map((chunk) => ({ text: { content: chunk } }));
+}
+
+function joinRichText(richText: { plain_text: string }[] | undefined): string | undefined {
+  const joined = richText?.map((r) => r.plain_text).join("");
+  return joined || undefined;
 }
 
 /**
@@ -233,6 +253,22 @@ export interface UserRecord {
  * benefits from a proper index (Notion queries are O(n) scans), so consider
  * mirroring `email` into a cache/KV lookup once the user base grows.
  */
+function mapPageToUser(page: PageObjectResponse): UserRecord {
+  const p = page.properties as any;
+  return {
+    id: page.id,
+    email: p.Email?.email ?? "",
+    passwordHash: p.PasswordHash?.rich_text?.[0]?.plain_text ?? "",
+    name: joinRichText(p.Name?.title),
+    avatarUrl: joinRichText(p.AvatarUrl?.rich_text),
+    lineUserId: p.LineUserId?.rich_text?.[0]?.plain_text || undefined,
+    notionApiKey: p.NotionApiKey?.rich_text?.[0]?.plain_text || undefined,
+    lineChannelAccessToken: p.LineChannelAccessToken?.rich_text?.[0]?.plain_text || undefined,
+    emailIntegrationStatus: (p.EmailIntegrationStatus?.select?.name ??
+      "disconnected") as "connected" | "disconnected",
+  };
+}
+
 export const UsersRepository = {
   async findByEmail(email: string): Promise<UserRecord | null> {
     const response = await notion.databases.query({
@@ -240,34 +276,27 @@ export const UsersRepository = {
       filter: { property: "Email", email: { equals: email } },
     });
     const page = response.results[0] as PageObjectResponse | undefined;
-    if (!page) return null;
-    const p = page.properties as any;
-    return {
-      id: page.id,
-      email: p.Email?.email ?? "",
-      passwordHash: p.PasswordHash?.rich_text?.[0]?.plain_text ?? "",
-      lineUserId: p.LineUserId?.rich_text?.[0]?.plain_text || undefined,
-      notionApiKey: p.NotionApiKey?.rich_text?.[0]?.plain_text || undefined,
-      lineChannelAccessToken: p.LineChannelAccessToken?.rich_text?.[0]?.plain_text || undefined,
-      emailIntegrationStatus: (p.EmailIntegrationStatus?.select?.name ??
-        "disconnected") as "connected" | "disconnected",
-    };
+    return page ? mapPageToUser(page) : null;
   },
 
-  async updateIntegrations(
-    userId: string,
-    input: { notionApiKey?: string; lineChannelAccessToken?: string },
-  ) {
+  async getById(userId: string): Promise<UserRecord> {
+    const page = (await notion.pages.retrieve({ page_id: userId })) as PageObjectResponse;
+    return mapPageToUser(page);
+  },
+
+  async updateProfile(userId: string, input: { name?: string; avatarUrl?: string }) {
     const props: Record<string, unknown> = {};
-    if (input.notionApiKey !== undefined) {
-      props.NotionApiKey = { rich_text: [{ text: { content: input.notionApiKey } }] };
+    if (input.name !== undefined) {
+      props.Name = { title: [{ text: { content: input.name } }] };
     }
-    if (input.lineChannelAccessToken !== undefined) {
-      props.LineChannelAccessToken = {
-        rich_text: [{ text: { content: input.lineChannelAccessToken } }],
-      };
+    if (input.avatarUrl !== undefined) {
+      props.AvatarUrl = { rich_text: chunkRichText(input.avatarUrl) };
     }
-    await notion.pages.update({ page_id: userId, properties: props as any });
+    const page = (await notion.pages.update({
+      page_id: userId,
+      properties: props as any,
+    })) as PageObjectResponse;
+    return mapPageToUser(page);
   },
 };
 

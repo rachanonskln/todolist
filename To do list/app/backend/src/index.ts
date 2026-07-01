@@ -8,14 +8,17 @@ import { tasksRouter } from "./routes/tasks.routes.js";
 import { categoriesRouter } from "./routes/categories.routes.js";
 import { lineRouter } from "./routes/line.routes.js";
 import { authRouter } from "./routes/auth.routes.js";
-import { settingsRouter } from "./routes/settings.routes.js";
+import { profileRouter } from "./routes/profile.routes.js";
+import { holidaysRouter } from "./routes/holidays.routes.js";
 import { internalRouter } from "./routes/internal.routes.js";
 
 const app = express();
 
 app.use(helmet());
 app.use(cors());
-app.use(express.json());
+// Raised from Express's 100kb default: profile avatar photos are uploaded as
+// compressed base64 data URLs in the request body.
+app.use(express.json({ limit: "2mb" }));
 
 // Public
 app.use("/api/auth", authRouter);
@@ -24,7 +27,8 @@ app.use("/line", lineRouter); // LINE verifies via its own HMAC middleware, not 
 // Authenticated (user-facing app)
 app.use("/api/tasks", requireAuth, tasksRouter);
 app.use("/api/categories", requireAuth, categoriesRouter);
-app.use("/api/settings", requireAuth, settingsRouter);
+app.use("/api/profile", requireAuth, profileRouter);
+app.use("/api/holidays", requireAuth, holidaysRouter);
 
 // Internal service-to-service (Scheduler Service, AI Processing Module)
 app.use("/internal", requireInternalKey, internalRouter);

@@ -1,12 +1,13 @@
 import { useLocale } from "@/i18n/LocaleContext";
 import { useAuth } from "@/lib/AuthContext";
+import { NotificationBell } from "./NotificationBell";
 
 export function Navbar() {
   const { locale, setLocale, t } = useLocale();
   const { logout } = useAuth();
 
   return (
-    <header className="glass-panel mb-6 flex items-center justify-between px-5 py-3">
+    <header className="glass-panel relative z-30 mb-6 flex items-center justify-between px-5 py-3">
       <div>
         <h1 className="text-lg font-semibold text-slate-800">{t.navbar.greeting}</h1>
         <p className="text-sm text-slate-500">{t.navbar.subtitle}</p>
@@ -19,9 +20,7 @@ export function Navbar() {
         >
           {locale === "th" ? "EN" : "ไทย"}
         </button>
-        <button className="glass-button !px-3 !py-2 text-lg" aria-label="Notifications">
-          🔔
-        </button>
+        <NotificationBell />
         <button
           className="glass-button !px-3 !py-2 text-sm"
           onClick={logout}

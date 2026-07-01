@@ -45,6 +45,14 @@ export interface TranslationShape {
     approve: string;
     reject: string;
   };
+  notifications: {
+    title: string;
+    empty: string;
+    clearAll: string;
+    dismiss: string;
+    reviewLabel: string;
+    dueSoonLabel: string;
+  };
   priority: { low: string; medium: string; high: string };
   status: { pending: string; in_progress: string; completed: string };
   calendar: {
@@ -148,6 +156,14 @@ export const translations: Record<Locale, TranslationShape> = {
       approve: "Approve",
       reject: "Reject",
     },
+    notifications: {
+      title: "Notifications",
+      empty: "You're all caught up. 🎉",
+      clearAll: "Clear all",
+      dismiss: "Dismiss",
+      reviewLabel: "AI suggestion pending review",
+      dueSoonLabel: "Due within 24 hours",
+    },
     priority: { low: "Low", medium: "Medium", high: "High" },
     status: { pending: "Pending", in_progress: "In progress", completed: "Completed" },
     calendar: {
@@ -246,6 +262,14 @@ export const translations: Record<Locale, TranslationShape> = {
       subtitle: "ดึงมาจากอีเมล/LINE อัตโนมัติ กดยืนยันหรือปฏิเสธแต่ละรายการ",
       approve: "ยืนยัน",
       reject: "ปฏิเสธ",
+    },
+    notifications: {
+      title: "การแจ้งเตือน",
+      empty: "ไม่มีการแจ้งเตือนใหม่ 🎉",
+      clearAll: "ล้างทั้งหมด",
+      dismiss: "ปิดการแจ้งเตือนนี้",
+      reviewLabel: "งานที่ AI แนะนำ รอตรวจสอบ",
+      dueSoonLabel: "ครบกำหนดภายใน 24 ชั่วโมง",
     },
     priority: { low: "ต่ำ", medium: "ปานกลาง", high: "สูง" },
     status: { pending: "รอดำเนินการ", in_progress: "กำลังทำ", completed: "เสร็จแล้ว" },
