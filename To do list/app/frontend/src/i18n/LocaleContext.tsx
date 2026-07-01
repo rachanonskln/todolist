@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useMemo, useState } from "react";
 import { translations, type Locale, type TranslationShape } from "./translations";
 
-const STORAGE_KEY = "aurora-tasks-locale";
+const STORAGE_KEY = "rachanon-blns-task-locale";
 
 interface LocaleContextValue {
   locale: Locale;

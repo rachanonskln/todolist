@@ -1,10 +1,19 @@
 export interface TranslationShape {
   nav: {
     dashboard: string;
+    tasks: string;
     calendar: string;
     newTask: string;
     settings: string;
     brand: string;
+  };
+  tasksList: {
+    title: string;
+    searchPlaceholder: string;
+    allStatuses: string;
+    allPriorities: string;
+    allCategories: string;
+    noResults: string;
   };
   navbar: {
     greeting: string;
@@ -38,6 +47,8 @@ export interface TranslationShape {
     category: string;
     uncategorized: string;
     remindBefore: string;
+    lineUserId: string;
+    lineUserIdHint: string;
     cancel: string;
     save: string;
     saving: string;
@@ -55,6 +66,16 @@ export interface TranslationShape {
     save: string;
     saved: string;
   };
+  login: {
+    title: string;
+    subtitle: string;
+    email: string;
+    password: string;
+    submit: string;
+    submitting: string;
+    invalidCredentials: string;
+    logout: string;
+  };
 }
 
 export type Locale = "en" | "th";
@@ -63,10 +84,19 @@ export const translations: Record<Locale, TranslationShape> = {
   en: {
     nav: {
       dashboard: "Dashboard",
+      tasks: "Tasks",
       calendar: "Calendar",
       newTask: "New Task",
       settings: "Settings",
-      brand: "Aurora Tasks",
+      brand: "Rachanon BLNS Task",
+    },
+    tasksList: {
+      title: "All Tasks",
+      searchPlaceholder: "Search by title...",
+      allStatuses: "All statuses",
+      allPriorities: "All priorities",
+      allCategories: "All categories",
+      noResults: "No tasks match your filters.",
     },
     navbar: {
       greeting: "Good to see you 👋",
@@ -100,6 +130,8 @@ export const translations: Record<Locale, TranslationShape> = {
       category: "Category",
       uncategorized: "Uncategorized",
       remindBefore: "Remind me before (minutes)",
+      lineUserId: "LINE User ID (for reminders)",
+      lineUserIdHint: "Optional — get this from the LINE bot's webhook logs or your Settings page.",
       cancel: "Cancel",
       save: "Save Task",
       saving: "Saving...",
@@ -117,14 +149,33 @@ export const translations: Record<Locale, TranslationShape> = {
       save: "Save Settings",
       saved: "Saved ✓",
     },
+    login: {
+      title: "Welcome back",
+      subtitle: "Sign in to Rachanon BLNS Task",
+      email: "Email",
+      password: "Password",
+      submit: "Sign in",
+      submitting: "Signing in...",
+      invalidCredentials: "Invalid email or password.",
+      logout: "Log out",
+    },
   },
   th: {
     nav: {
       dashboard: "แดชบอร์ด",
+      tasks: "งานทั้งหมด",
       calendar: "ปฏิทิน",
       newTask: "เพิ่มงาน",
       settings: "ตั้งค่า",
-      brand: "Aurora Tasks",
+      brand: "Rachanon BLNS Task",
+    },
+    tasksList: {
+      title: "งานทั้งหมด",
+      searchPlaceholder: "ค้นหาจากหัวข้องาน...",
+      allStatuses: "ทุกสถานะ",
+      allPriorities: "ทุกความสำคัญ",
+      allCategories: "ทุกหมวดหมู่",
+      noResults: "ไม่พบงานที่ตรงกับตัวกรอง",
     },
     navbar: {
       greeting: "ยินดีต้อนรับกลับมา 👋",
@@ -158,6 +209,8 @@ export const translations: Record<Locale, TranslationShape> = {
       category: "หมวดหมู่",
       uncategorized: "ไม่มีหมวดหมู่",
       remindBefore: "แจ้งเตือนล่วงหน้า (นาที)",
+      lineUserId: "LINE User ID (สำหรับแจ้งเตือน)",
+      lineUserIdHint: "ไม่บังคับ — ดูได้จาก webhook log ของ LINE bot หรือหน้าตั้งค่า",
       cancel: "ยกเลิก",
       save: "บันทึกงาน",
       saving: "กำลังบันทึก...",
@@ -174,6 +227,16 @@ export const translations: Record<Locale, TranslationShape> = {
       disconnect: "ยกเลิกการเชื่อมต่อ",
       save: "บันทึกการตั้งค่า",
       saved: "บันทึกแล้ว ✓",
+    },
+    login: {
+      title: "ยินดีต้อนรับกลับมา",
+      subtitle: "เข้าสู่ระบบ Rachanon BLNS Task",
+      email: "อีเมล",
+      password: "รหัสผ่าน",
+      submit: "เข้าสู่ระบบ",
+      submitting: "กำลังเข้าสู่ระบบ...",
+      invalidCredentials: "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+      logout: "ออกจากระบบ",
     },
   },
 };

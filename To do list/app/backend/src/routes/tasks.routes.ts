@@ -18,10 +18,17 @@ const taskInputSchema = z.object({
 
 tasksRouter.get("/", async (req, res, next) => {
   try {
-    const { status, categoryId } = req.query as { status?: string; categoryId?: string };
+    const { status, categoryId, priority, q } = req.query as {
+      status?: string;
+      categoryId?: string;
+      priority?: string;
+      q?: string;
+    };
     const tasks = await TasksRepository.list({
       status: status as any,
       categoryId,
+      priority: priority as any,
+      q,
     });
     res.json(tasks);
   } catch (err) {

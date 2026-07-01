@@ -79,13 +79,26 @@ function taskToProperties(input: Partial<TaskInput>) {
 }
 
 export const TasksRepository = {
-  async list(filter?: { status?: TaskStatus; categoryId?: string }) {
+  async list(filter?: {
+    status?: TaskStatus;
+    categoryId?: string;
+    priority?: TaskPriority;
+    q?: string;
+  }) {
     const andFilters: any[] = [];
     if (filter?.status) {
       andFilters.push({ property: "Status", select: { equals: filter.status } });
     }
     if (filter?.categoryId) {
       andFilters.push({ property: "Category", relation: { contains: filter.categoryId } });
+    }
+    if (filter?.priority) {
+      andFilters.push({ property: "Priority", select: { equals: filter.priority } });
+    }
+    if (filter?.q) {
+      // Notion has no cross-property full-text search via the API — match
+      // against the Title property only (the field users actually scan).
+      andFilters.push({ property: "Title", title: { contains: filter.q } });
     }
 
     const response = await notion.databases.query({

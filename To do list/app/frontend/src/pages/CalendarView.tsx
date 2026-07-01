@@ -16,8 +16,8 @@ import { enUS, th as thLocale } from "date-fns/locale";
 import clsx from "clsx";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { GlassButton } from "@/components/ui/GlassButton";
-import { TasksApi } from "@/lib/api";
-import type { Task } from "@/types/task";
+import { CategoriesApi, TasksApi } from "@/lib/api";
+import type { Category, Task } from "@/types/task";
 import { useLocale } from "@/i18n/LocaleContext";
 
 export function CalendarView() {
@@ -26,13 +26,19 @@ export function CalendarView() {
 
   const [cursor, setCursor] = useState(new Date());
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
 
   useEffect(() => {
     TasksApi.list()
       .then(setTasks)
       .catch((err) => console.error("Failed to load tasks", err));
+    CategoriesApi.list()
+      .then(setCategories)
+      .catch((err) => console.error("Failed to load categories", err));
   }, []);
+
+  const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
 
   const days = useMemo(() => {
     const start = startOfWeek(startOfMonth(cursor));
@@ -77,11 +83,15 @@ export function CalendarView() {
               >
                 <span className="text-xs font-semibold">{format(day, "d")}</span>
                 <div className="mt-1 flex flex-wrap gap-1">
-                  {dayTasks.slice(0, 3).map((t) => (
+                  {dayTasks.slice(0, 3).map((task) => (
                     <span
-                      key={t.id}
+                      key={task.id}
                       className="h-1.5 w-1.5 rounded-full"
-                      style={{ backgroundColor: t.category?.color ?? "#cdeeff" }}
+                      style={{
+                        backgroundColor: task.categoryId
+                          ? categoryById.get(task.categoryId)?.color ?? "#cdeeff"
+                          : "#cdeeff",
+                      }}
                     />
                   ))}
                 </div>

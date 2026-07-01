@@ -1,4 +1,4 @@
-# Aurora Tasks — To-Do, Calendar & LINE Reminder (Notion + AI)
+# Rachanon BLNS Task — To-Do, Calendar & LINE Reminder (Notion + AI)
 
 Reference implementation of the architecture in
 `../System_Architecture_Design_To-Do_List,_Calendar_&_LINE_Reminder_with_Notion_and_AI.docx`.
@@ -40,13 +40,23 @@ uvicorn main:app --reload --port 8000            # http://localhost:8000
 #    https://api.notion.com/v1/databases, Categories first (Tasks/Logs
 #    reference it by id), then paste the resulting ids into backend/.env
 
-# 5. Scheduler (local dev only — see scheduler/local-dev-cron.ts)
+# 5. Create your first login (one-time, after step 4) — never hardcode
+#    real credentials in a file; pass them as env vars for this one command
+SEED_USER_EMAIL=you@example.com SEED_USER_PASSWORD='...' \
+  npx tsx backend/scripts/seed-user.ts
+
+# 6. Scheduler (local dev only — see scheduler/local-dev-cron.ts)
 npx tsx scheduler/local-dev-cron.ts
 ```
 
+The frontend has no anonymous access — every route redirects to `/login`
+(`frontend/src/components/layout/RequireAuth.tsx`) until `POST /api/auth/login`
+returns a JWT, which is what step 5 above sets up an account for.
+
 ## Request flow
 
-1. **User** interacts with the **Frontend** (Dashboard, Calendar, Task form, Settings).
+1. **User** interacts with the **Frontend** (Login, Dashboard, Tasks list with
+   filter/search, Calendar, Task form, Settings).
 2. **Frontend** calls the **Backend API** (`/api/*`) over JSON/HTTPS with a JWT.
 3. **Backend** reads/writes the **Notion** databases (Tasks, Categories, Users, Logs)
    via `backend/src/services/notionService.ts`.

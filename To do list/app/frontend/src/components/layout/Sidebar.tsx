@@ -6,6 +6,7 @@ function useNavItems() {
   const { t } = useLocale();
   return [
     { to: "/", label: t.nav.dashboard, icon: "✨" },
+    { to: "/tasks", label: t.nav.tasks, icon: "📋" },
     { to: "/calendar", label: t.nav.calendar, icon: "🗓️" },
     { to: "/tasks/new", label: t.nav.newTask, icon: "➕" },
     { to: "/settings", label: t.nav.settings, icon: "⚙️" },

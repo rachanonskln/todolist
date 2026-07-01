@@ -13,6 +13,7 @@ const emptyForm: TaskInput = {
   endDate: "",
   status: "pending",
   priority: "medium",
+  lineUserId: "",
   reminderMinutesBefore: 30,
 };
 
@@ -39,7 +40,8 @@ export function TaskForm() {
           endDate: task.endDate,
           status: task.status,
           priority: task.priority,
-          categoryId: task.category?.id,
+          categoryId: task.categoryId,
+          lineUserId: task.lineUserId ?? "",
           reminderMinutesBefore: task.reminderMinutesBefore ?? 30,
         }),
       );
@@ -168,6 +170,16 @@ export function TaskForm() {
             value={form.reminderMinutesBefore}
             onChange={(e) => update("reminderMinutesBefore", Number(e.target.value))}
           />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm text-slate-600">{t.taskForm.lineUserId}</label>
+          <input
+            className="glass-input"
+            value={form.lineUserId ?? ""}
+            onChange={(e) => update("lineUserId", e.target.value)}
+          />
+          <p className="mt-1 text-xs text-slate-400">{t.taskForm.lineUserIdHint}</p>
         </div>
 
         <div className="mt-2 flex justify-end gap-3">

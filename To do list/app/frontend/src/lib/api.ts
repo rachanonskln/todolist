@@ -15,6 +15,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// A 401 means the token is missing/expired — clear it and bounce to /login
+// rather than leaving the UI stuck showing stale or empty authenticated data.
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 && window.location.pathname !== "/login") {
+      localStorage.removeItem("authToken");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  },
+);
+
 // If there's no backend behind `apiBaseUrl` yet, a request to an unmapped
 // path can still resolve with HTTP 200 (e.g. a static host's SPA fallback
 // serving index.html instead of a 404/JSON). Without this check, that HTML
@@ -27,8 +40,18 @@ function assertArray<T>(data: unknown, context: string): T[] {
   return data as T[];
 }
 
+export const AuthApi = {
+  login: (email: string, password: string) =>
+    api
+      .post<{ token: string; user: { id: string; email: string } }>("/auth/login", {
+        email,
+        password,
+      })
+      .then((r) => r.data),
+};
+
 export const TasksApi = {
-  list: (params?: { status?: string; categoryId?: string; q?: string }) =>
+  list: (params?: { status?: string; categoryId?: string; priority?: string; q?: string }) =>
     api.get<Task[]>("/tasks", { params }).then((r) => assertArray<Task>(r.data, "GET /tasks")),
   get: (id: string) => api.get<Task>(`/tasks/${id}`).then((r) => r.data),
   create: (input: TaskInput) =>

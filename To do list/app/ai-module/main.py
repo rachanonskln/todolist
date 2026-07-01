@@ -11,8 +11,10 @@ pipeline (nlp_extractor -> notion_formatter), so accuracy improvements to
 the Gemini prompt benefit both sources at once.
 """
 
+from typing import Optional
+
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
 
 from config import settings
@@ -39,7 +41,7 @@ async def analyze_line_message(payload: LineMessagePayload):
 class EmailScanUser(BaseModel):
     userId: str
     gmailRefreshToken: str
-    lineUserId: str | None = None
+    lineUserId: Optional[str] = None
 
 
 @app.post("/scan/emails")

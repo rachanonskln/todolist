@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { PriorityBadge, StatusBadge } from "@/components/ui/Badge";
-import { TasksApi } from "@/lib/api";
-import type { Task } from "@/types/task";
+import { CategoriesApi, TasksApi } from "@/lib/api";
+import type { Category, Task } from "@/types/task";
 import { isToday, parseISO } from "date-fns";
 import { useLocale } from "@/i18n/LocaleContext";
 
@@ -26,6 +26,7 @@ function SummaryStat({
 export function Dashboard() {
   const { t } = useLocale();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -36,7 +37,12 @@ export function Dashboard() {
         setTasks([]);
       })
       .finally(() => setLoading(false));
+    CategoriesApi.list()
+      .then(setCategories)
+      .catch((err) => console.error("Failed to load categories", err));
   }, []);
+
+  const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
 
   const stats = useMemo(() => {
     const todayTasks = tasks.filter((t) => isToday(parseISO(t.startDate)));
@@ -77,29 +83,32 @@ export function Dashboard() {
         )}
 
         <ul className="flex flex-col gap-3">
-          {stats.todayTasks.map((task) => (
-            <li
-              key={task.id}
-              className="flex items-center justify-between rounded-2xl border border-white/40
-                bg-white/40 px-4 py-3 backdrop-blur-glass transition hover:bg-white/60"
-            >
-              <div>
-                <p className="font-medium text-slate-800">{task.title}</p>
-                {task.category && (
-                  <span
-                    className="mt-1 inline-block rounded-full px-2 py-0.5 text-xs text-white"
-                    style={{ backgroundColor: task.category.color }}
-                  >
-                    {task.category.name}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <PriorityBadge priority={task.priority} />
-                <StatusBadge status={task.status} />
-              </div>
-            </li>
-          ))}
+          {stats.todayTasks.map((task) => {
+            const category = task.categoryId ? categoryById.get(task.categoryId) : undefined;
+            return (
+              <li
+                key={task.id}
+                className="flex items-center justify-between rounded-2xl border border-white/40
+                  bg-white/40 px-4 py-3 backdrop-blur-glass transition hover:bg-white/60"
+              >
+                <div>
+                  <p className="font-medium text-slate-800">{task.title}</p>
+                  {category && (
+                    <span
+                      className="mt-1 inline-block rounded-full px-2 py-0.5 text-xs text-white"
+                      style={{ backgroundColor: category.color }}
+                    >
+                      {category.name}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <PriorityBadge priority={task.priority} />
+                  <StatusBadge status={task.status} />
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </GlassCard>
     </div>

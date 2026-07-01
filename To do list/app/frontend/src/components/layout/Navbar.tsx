@@ -1,7 +1,9 @@
 import { useLocale } from "@/i18n/LocaleContext";
+import { useAuth } from "@/lib/AuthContext";
 
 export function Navbar() {
   const { locale, setLocale, t } = useLocale();
+  const { logout } = useAuth();
 
   return (
     <header className="glass-panel mb-6 flex items-center justify-between px-5 py-3">
@@ -19,6 +21,14 @@ export function Navbar() {
         </button>
         <button className="glass-button !px-3 !py-2 text-lg" aria-label="Notifications">
           🔔
+        </button>
+        <button
+          className="glass-button !px-3 !py-2 text-sm"
+          onClick={logout}
+          aria-label={t.login.logout}
+          title={t.login.logout}
+        >
+          🚪
         </button>
         <div className="h-9 w-9 rounded-full bg-rainbow-pastel bg-300% animate-gradient-shift" />
       </div>

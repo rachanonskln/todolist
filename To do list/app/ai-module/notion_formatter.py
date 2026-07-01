@@ -6,7 +6,7 @@ names and avoids two services fighting over Notion rate limits.
 """
 
 from datetime import timedelta, datetime
-from typing import Literal
+from typing import Literal, Optional
 
 import httpx
 
@@ -19,7 +19,7 @@ DEFAULT_DURATION = timedelta(hours=1)
 def to_task_payload(
     task: ExtractedTask,
     source: Literal["ai_email", "ai_line"],
-    line_user_id: str | None = None,
+    line_user_id: Optional[str] = None,
 ) -> dict:
     start = task.due_date or datetime.utcnow().isoformat()
     end = (datetime.fromisoformat(start) + DEFAULT_DURATION).isoformat()

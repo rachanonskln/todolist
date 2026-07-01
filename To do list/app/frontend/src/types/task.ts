@@ -7,23 +7,21 @@ export interface Category {
   color: string; // hex, drives the pastel tag color in the UI
 }
 
+// Mirrors the backend's TaskRecord (backend/src/services/notionService.ts)
+// exactly — the API returns a flat categoryId, never a nested category
+// object, so components that need the name/color must resolve it from a
+// separately-fetched category list instead of reading `task.category`.
 export interface Task {
   id: string;
-  notionPageId?: string;
   title: string;
   description?: string;
   startDate: string; // ISO 8601
   endDate: string; // ISO 8601
   status: TaskStatus;
   priority: TaskPriority;
-  category?: Category;
+  categoryId?: string;
   lineUserId?: string;
   reminderMinutesBefore?: number;
-  createdAt: string;
-  updatedAt: string;
 }
 
-export type TaskInput = Omit<
-  Task,
-  "id" | "notionPageId" | "createdAt" | "updatedAt" | "category"
-> & { categoryId?: string };
+export type TaskInput = Omit<Task, "id">;
