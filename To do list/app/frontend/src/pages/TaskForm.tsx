@@ -14,6 +14,7 @@ const emptyForm: TaskInput = {
   status: "pending",
   priority: "medium",
   lineUserId: "",
+  assignee: "",
   reminderMinutesBefore: 30,
 };
 
@@ -25,12 +26,16 @@ export function TaskForm() {
 
   const [form, setForm] = useState<TaskInput>(emptyForm);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [assigneeOptions, setAssigneeOptions] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     CategoriesApi.list()
       .then(setCategories)
       .catch((err) => console.error("Failed to load categories", err));
+    TasksApi.listAssignees()
+      .then(setAssigneeOptions)
+      .catch((err) => console.error("Failed to load assignees", err));
     if (isEdit && id) {
       TasksApi.get(id).then((task) =>
         setForm({
@@ -42,6 +47,7 @@ export function TaskForm() {
           priority: task.priority,
           categoryId: task.categoryId,
           lineUserId: task.lineUserId ?? "",
+          assignee: task.assignee ?? "",
           reminderMinutesBefore: task.reminderMinutesBefore ?? 30,
         }),
       );
@@ -170,6 +176,22 @@ export function TaskForm() {
             value={form.reminderMinutesBefore}
             onChange={(e) => update("reminderMinutesBefore", Number(e.target.value))}
           />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm text-slate-600">{t.taskForm.assignee}</label>
+          <input
+            className="glass-input"
+            list="assignee-options"
+            value={form.assignee ?? ""}
+            onChange={(e) => update("assignee", e.target.value)}
+            placeholder={t.taskForm.assigneePlaceholder}
+          />
+          <datalist id="assignee-options">
+            {assigneeOptions.map((name) => (
+              <option key={name} value={name} />
+            ))}
+          </datalist>
         </div>
 
         <div>

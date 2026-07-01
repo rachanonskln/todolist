@@ -21,6 +21,7 @@ export interface Task {
   priority: TaskPriority;
   categoryId?: string;
   lineUserId?: string;
+  assignee?: string;
   reminderMinutesBefore?: number;
 }
 

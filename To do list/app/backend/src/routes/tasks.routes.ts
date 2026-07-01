@@ -13,6 +13,7 @@ const taskInputSchema = z.object({
   priority: z.enum(["low", "medium", "high"]),
   categoryId: z.string().optional(),
   lineUserId: z.string().optional(),
+  assignee: z.string().optional(),
   reminderMinutesBefore: z.number().int().min(0).optional(),
 });
 
@@ -31,6 +32,15 @@ tasksRouter.get("/", async (req, res, next) => {
       q,
     });
     res.json(tasks);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Must come before "/:id" — otherwise Express would treat "assignees" as an id.
+tasksRouter.get("/assignees", async (_req, res, next) => {
+  try {
+    res.json(await TasksRepository.listDistinctAssignees());
   } catch (err) {
     next(err);
   }

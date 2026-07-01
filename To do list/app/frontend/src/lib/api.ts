@@ -59,6 +59,10 @@ export const TasksApi = {
   update: (id: string, input: Partial<TaskInput>) =>
     api.patch<Task>(`/tasks/${id}`, input).then((r) => r.data),
   remove: (id: string) => api.delete(`/tasks/${id}`),
+  listAssignees: () =>
+    api
+      .get<string[]>("/tasks/assignees")
+      .then((r) => assertArray<string>(r.data, "GET /tasks/assignees")),
 };
 
 export const CategoriesApi = {

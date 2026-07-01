@@ -26,6 +26,18 @@ export interface TranslationShape {
     highPriority: string;
     todaysTasks: string;
     noTasksToday: string;
+    forecast7Day: string;
+    pm25: string;
+    pm25Unit: string;
+    weatherUnavailable: string;
+    useMyLocation: string;
+    pm25Level: {
+      veryGood: string;
+      good: string;
+      moderate: string;
+      unhealthySensitive: string;
+      unhealthy: string;
+    };
   };
   priority: { low: string; medium: string; high: string };
   status: { pending: string; in_progress: string; completed: string };
@@ -49,6 +61,8 @@ export interface TranslationShape {
     remindBefore: string;
     lineUserId: string;
     lineUserIdHint: string;
+    assignee: string;
+    assigneePlaceholder: string;
     cancel: string;
     save: string;
     saving: string;
@@ -109,6 +123,18 @@ export const translations: Record<Locale, TranslationShape> = {
       highPriority: "High Priority",
       todaysTasks: "Today's Tasks",
       noTasksToday: "No tasks scheduled for today. 🌤️",
+      forecast7Day: "7-Day Forecast",
+      pm25: "PM2.5 (real-time)",
+      pm25Unit: "µg/m³",
+      weatherUnavailable: "Weather data unavailable right now.",
+      useMyLocation: "Use my location",
+      pm25Level: {
+        veryGood: "Very Good",
+        good: "Good",
+        moderate: "Moderate",
+        unhealthySensitive: "Unhealthy for sensitive groups",
+        unhealthy: "Unhealthy",
+      },
     },
     priority: { low: "Low", medium: "Medium", high: "High" },
     status: { pending: "Pending", in_progress: "In progress", completed: "Completed" },
@@ -132,6 +158,8 @@ export const translations: Record<Locale, TranslationShape> = {
       remindBefore: "Remind me before (minutes)",
       lineUserId: "LINE User ID (for reminders)",
       lineUserIdHint: "Optional — get this from the LINE bot's webhook logs or your Settings page.",
+      assignee: "Assigned to",
+      assigneePlaceholder: "e.g. Prof. Somchai",
       cancel: "Cancel",
       save: "Save Task",
       saving: "Saving...",
@@ -188,6 +216,18 @@ export const translations: Record<Locale, TranslationShape> = {
       highPriority: "ความสำคัญสูง",
       todaysTasks: "งานของวันนี้",
       noTasksToday: "ไม่มีงานสำหรับวันนี้ 🌤️",
+      forecast7Day: "พยากรณ์อากาศ 7 วัน",
+      pm25: "PM2.5 (เรียลไทม์)",
+      pm25Unit: "ไมโครกรัม/ลบ.ม.",
+      weatherUnavailable: "ดึงข้อมูลสภาพอากาศไม่ได้ในขณะนี้",
+      useMyLocation: "ใช้ตำแหน่งของฉัน",
+      pm25Level: {
+        veryGood: "ดีมาก",
+        good: "ดี",
+        moderate: "ปานกลาง",
+        unhealthySensitive: "เริ่มมีผลกระทบต่อกลุ่มเสี่ยง",
+        unhealthy: "มีผลกระทบต่อสุขภาพ",
+      },
     },
     priority: { low: "ต่ำ", medium: "ปานกลาง", high: "สูง" },
     status: { pending: "รอดำเนินการ", in_progress: "กำลังทำ", completed: "เสร็จแล้ว" },
@@ -211,6 +251,8 @@ export const translations: Record<Locale, TranslationShape> = {
       remindBefore: "แจ้งเตือนล่วงหน้า (นาที)",
       lineUserId: "LINE User ID (สำหรับแจ้งเตือน)",
       lineUserIdHint: "ไม่บังคับ — ดูได้จาก webhook log ของ LINE bot หรือหน้าตั้งค่า",
+      assignee: "ผู้ได้รับมอบหมาย",
+      assigneePlaceholder: "เช่น อาจารย์สมชาย",
       cancel: "ยกเลิก",
       save: "บันทึกงาน",
       saving: "กำลังบันทึก...",

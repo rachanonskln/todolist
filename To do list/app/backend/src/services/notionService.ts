@@ -17,6 +17,7 @@ export interface TaskRecord {
   priority: TaskPriority;
   categoryId?: string;
   lineUserId?: string;
+  assignee?: string;
   reminderMinutesBefore: number;
 }
 
@@ -29,6 +30,7 @@ export interface TaskInput {
   priority: TaskPriority;
   categoryId?: string;
   lineUserId?: string;
+  assignee?: string;
   reminderMinutesBefore?: number;
 }
 
@@ -45,6 +47,7 @@ function mapPageToTask(page: PageObjectResponse): TaskRecord {
     priority: (p.Priority?.select?.name ?? "medium") as TaskPriority,
     categoryId: p.Category?.relation?.[0]?.id,
     lineUserId: p.LineUserId?.rich_text?.[0]?.plain_text || undefined,
+    assignee: p.Assignee?.rich_text?.[0]?.plain_text || undefined,
     reminderMinutesBefore: p.ReminderMinutesBefore?.number ?? 30,
   };
 }
@@ -71,6 +74,9 @@ function taskToProperties(input: Partial<TaskInput>) {
   }
   if (input.lineUserId !== undefined) {
     props.LineUserId = { rich_text: [{ text: { content: input.lineUserId } }] };
+  }
+  if (input.assignee !== undefined) {
+    props.Assignee = { rich_text: [{ text: { content: input.assignee } }] };
   }
   if (input.reminderMinutesBefore !== undefined) {
     props.ReminderMinutesBefore = { number: input.reminderMinutesBefore };
@@ -113,6 +119,22 @@ export const TasksRepository = {
   async get(pageId: string) {
     const page = (await notion.pages.retrieve({ page_id: pageId })) as PageObjectResponse;
     return mapPageToTask(page);
+  },
+
+  /** Distinct assignee names already used, most-recent first — powers the
+   * autocomplete "remember what I typed before" behavior in the task form. */
+  async listDistinctAssignees(): Promise<string[]> {
+    const response = await notion.databases.query({
+      database_id: env.notion.tasksDbId,
+      filter: { property: "Assignee", rich_text: { is_not_empty: true } },
+      sorts: [{ timestamp: "last_edited_time", direction: "descending" }],
+    });
+    const seen = new Set<string>();
+    for (const page of response.results as PageObjectResponse[]) {
+      const name = (page.properties as any).Assignee?.rich_text?.[0]?.plain_text;
+      if (name) seen.add(name);
+    }
+    return [...seen];
   },
 
   async create(input: TaskInput) {

@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { PriorityBadge, StatusBadge } from "@/components/ui/Badge";
+import { LiveClock } from "@/components/dashboard/LiveClock";
+import { ForecastCard, Pm25Card } from "@/components/dashboard/WeatherWidgets";
 import { CategoriesApi, TasksApi } from "@/lib/api";
+import { DEFAULT_COORDS, fetchWeather, type WeatherData } from "@/lib/weatherApi";
 import type { Category, Task } from "@/types/task";
 import { isToday, parseISO } from "date-fns";
 import { useLocale } from "@/i18n/LocaleContext";
@@ -29,6 +32,30 @@ export function Dashboard() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(true);
+
+  const loadWeather = (coords?: { latitude: number; longitude: number }) => {
+    setWeatherLoading(true);
+    fetchWeather(coords)
+      .then(setWeather)
+      .catch((err) => {
+        console.error("Failed to load weather", err);
+        setWeather(null);
+      })
+      .finally(() => setWeatherLoading(false));
+  };
+
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => loadWeather({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+      // Permission denied or unavailable — silently keep the default location
+      // rather than blocking the widget on a browser permission prompt.
+      () => {},
+    );
+  };
+
   useEffect(() => {
     TasksApi.list()
       .then(setTasks)
@@ -40,6 +67,7 @@ export function Dashboard() {
     CategoriesApi.list()
       .then(setCategories)
       .catch((err) => console.error("Failed to load categories", err));
+    loadWeather(DEFAULT_COORDS);
   }, []);
 
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
@@ -66,6 +94,13 @@ export function Dashboard() {
           accent="pink"
         />
       </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <LiveClock />
+        <Pm25Card weather={weather} loading={weatherLoading} />
+      </div>
+
+      <ForecastCard weather={weather} loading={weatherLoading} onUseMyLocation={handleUseMyLocation} />
 
       <GlassCard>
         <h2 className="mb-4 text-base font-semibold text-slate-700">{t.dashboard.todaysTasks}</h2>

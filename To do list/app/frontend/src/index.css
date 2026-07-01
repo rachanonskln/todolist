@@ -63,8 +63,13 @@
       hover:bg-white/70 hover:shadow-lg active:scale-95;
   }
 
+  /* text-white here used to sit directly on the pastel gradient — every hue
+     in that gradient (lemon #fff6c9, mint #d3f8e2, sky #cdeeff...) is too
+     light for white text to pass contrast, so labels were unreadable. Using
+     the same dark slate text as the rest of the glass UI keeps contrast high
+     against all of them. */
   .glass-button-primary {
-    @apply glass-button text-white border-white/30 bg-rainbow-pastel bg-300%
+    @apply glass-button font-semibold text-slate-800 border-white/30 bg-rainbow-pastel bg-300%
       animate-gradient-shift bg-[length:300%_300%];
   }
 
