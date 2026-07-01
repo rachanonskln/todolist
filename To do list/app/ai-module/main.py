@@ -11,6 +11,7 @@ pipeline (nlp_extractor -> notion_formatter), so accuracy improvements to
 the Gemini prompt benefit both sources at once.
 """
 
+import base64
 from typing import Optional
 
 import httpx
@@ -19,7 +20,7 @@ from pydantic import BaseModel
 
 from config import settings
 from email_connector import fetch_unread_messages
-from line_listener import process_line_message
+from line_listener import process_line_file, process_line_message
 from nlp_extractor import extract_tasks
 from notion_formatter import submit_task, to_task_payload
 
@@ -35,6 +36,24 @@ class LineMessagePayload(BaseModel):
 @app.post("/analyze/line-message")
 async def analyze_line_message(payload: LineMessagePayload):
     created = await process_line_message(payload.lineUserId, payload.text)
+    return {"tasksCreated": len(created), "tasks": created}
+
+
+class LineFilePayload(BaseModel):
+    lineUserId: str
+    fileName: str
+    mimeType: str
+    contentBase64: str
+    timestamp: int
+
+
+@app.post("/analyze/line-file")
+async def analyze_line_file(payload: LineFilePayload):
+    """Backend forwards every LINE image/file message here — a photographed
+    notice, a PDF syllabus, a Word doc, whatever gets sent — so it can be
+    read and turned into pending-review tasks the same way email is."""
+    content = base64.b64decode(payload.contentBase64)
+    created = await process_line_file(payload.lineUserId, payload.mimeType, content)
     return {"tasksCreated": len(created), "tasks": created}
 
 

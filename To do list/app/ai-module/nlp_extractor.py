@@ -52,11 +52,25 @@ def extract_tasks(source_text: str) -> list[ExtractedTask]:
     if not source_text.strip():
         return []
 
-    model = genai.GenerativeModel(_MODEL_NAME)
     prompt = _EXTRACTION_PROMPT.format(now=datetime.utcnow().isoformat(), source_text=source_text)
+    return _run_extraction([prompt])
 
+
+def extract_tasks_from_image(image_bytes: bytes, mime_type: str) -> list[ExtractedTask]:
+    """Same extraction pipeline as `extract_tasks`, but for a photo/screenshot
+    sent via LINE (e.g. a photographed notice board or a schedule screenshot)
+    instead of plain text — Gemini reads the image directly."""
+    prompt = _EXTRACTION_PROMPT.format(
+        now=datetime.utcnow().isoformat(),
+        source_text="(see attached image — extract any tasks, deadlines, or events visible in it)",
+    )
+    return _run_extraction([prompt, {"mime_type": mime_type, "data": image_bytes}])
+
+
+def _run_extraction(contents: list) -> list[ExtractedTask]:
+    model = genai.GenerativeModel(_MODEL_NAME)
     response = model.generate_content(
-        prompt,
+        contents,
         generation_config=genai.GenerationConfig(
             response_mime_type="application/json",
             temperature=0.1,

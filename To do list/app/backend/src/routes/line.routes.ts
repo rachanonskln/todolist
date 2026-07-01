@@ -1,6 +1,12 @@
 import { Router } from "express";
 import type { WebhookEvent } from "@line/bot-sdk";
-import { lineWebhookMiddleware, isTrackableTextMessage } from "../services/lineService.js";
+import {
+  lineWebhookMiddleware,
+  isTrackableTextMessage,
+  isTrackableFileMessage,
+  guessLineMimeType,
+  lineClient,
+} from "../services/lineService.js";
 import { TasksRepository, LogsRepository } from "../services/notionService.js";
 import { env } from "../config/env.js";
 
@@ -43,6 +49,30 @@ lineRouter.post("/webhook", lineWebhookMiddleware, async (req, res) => {
           body: JSON.stringify({
             lineUserId: event.source.userId,
             text: event.message.text,
+            timestamp: event.timestamp,
+          }),
+        });
+      }
+
+      if (isTrackableFileMessage(event)) {
+        // Photos, PDFs, Word docs sent in LINE go through the same
+        // extract -> pending-review pipeline as email attachments.
+        const fileName = event.message.type === "file" ? event.message.fileName : undefined;
+        const mimeType = guessLineMimeType(event.message.type, fileName);
+
+        const stream = await lineClient.getMessageContent(event.message.id);
+        const chunks: Buffer[] = [];
+        for await (const chunk of stream) chunks.push(chunk as Buffer);
+        const contentBase64 = Buffer.concat(chunks).toString("base64");
+
+        await fetch(`${env.aiModuleUrl}/analyze/line-file`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            lineUserId: event.source.userId,
+            fileName: fileName ?? `image-${event.message.id}.jpg`,
+            mimeType,
+            contentBase64,
             timestamp: event.timestamp,
           }),
         });

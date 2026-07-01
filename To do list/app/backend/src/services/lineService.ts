@@ -104,3 +104,30 @@ export function isTrackableTextMessage(event: WebhookEvent): event is WebhookEve
 } {
   return event.type === "message" && event.message.type === "text";
 }
+
+/** Any file the user sends via LINE — a photo, a PDF, a Word doc — gets read
+ * and turned into candidate tasks the same way an email attachment does. */
+export function isTrackableFileMessage(event: WebhookEvent): event is WebhookEvent & {
+  type: "message";
+  message: { type: "image" | "file"; id: string };
+} {
+  return event.type === "message" && (event.message.type === "image" || event.message.type === "file");
+}
+
+const EXTENSION_MIME_TYPES: Record<string, string> = {
+  pdf: "application/pdf",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  txt: "text/plain",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+};
+
+/** LINE only tells us the file name for "file" messages (never a MIME type),
+ * so we guess from the extension; "image" messages are always JPEG per the
+ * LINE Messaging API's own content delivery format. */
+export function guessLineMimeType(messageType: "image" | "file", fileName?: string): string {
+  if (messageType === "image") return "image/jpeg";
+  const ext = fileName?.split(".").pop()?.toLowerCase() ?? "";
+  return EXTENSION_MIME_TYPES[ext] ?? "application/octet-stream";
+}
