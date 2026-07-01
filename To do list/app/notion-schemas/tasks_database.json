@@ -1,0 +1,36 @@
+{
+  "_comment": "POST https://api.notion.com/v1/databases with this body to create the Tasks database. Replace {{PARENT_PAGE_ID}} and {{CATEGORIES_DATABASE_ID}} (create categories_database.json first).",
+  "parent": { "type": "page_id", "page_id": "{{PARENT_PAGE_ID}}" },
+  "title": [{ "type": "text", "text": { "content": "Tasks" } }],
+  "properties": {
+    "Title": { "title": {} },
+    "Description": { "rich_text": {} },
+    "Date": { "date": {} },
+    "Status": {
+      "select": {
+        "options": [
+          { "name": "pending", "color": "blue" },
+          { "name": "in_progress", "color": "purple" },
+          { "name": "completed", "color": "green" }
+        ]
+      }
+    },
+    "Priority": {
+      "select": {
+        "options": [
+          { "name": "low", "color": "green" },
+          { "name": "medium", "color": "yellow" },
+          { "name": "high", "color": "red" }
+        ]
+      }
+    },
+    "Category": {
+      "relation": {
+        "database_id": "{{CATEGORIES_DATABASE_ID}}",
+        "single_property": {}
+      }
+    },
+    "LineUserId": { "rich_text": {} },
+    "ReminderMinutesBefore": { "number": { "format": "number" } }
+  }
+}

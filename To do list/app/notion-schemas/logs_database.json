@@ -1,0 +1,26 @@
+{
+  "_comment": "Append-only audit trail written by LogsRepository (backend/src/services/notionService.ts). Create Tasks database first for the RelatedTask relation.",
+  "parent": { "type": "page_id", "page_id": "{{PARENT_PAGE_ID}}" },
+  "title": [{ "type": "text", "text": { "content": "Logs" } }],
+  "properties": {
+    "Name": { "title": {} },
+    "Source": {
+      "select": {
+        "options": [
+          { "name": "ai_email", "color": "blue" },
+          { "name": "ai_line", "color": "green" },
+          { "name": "reminder", "color": "orange" },
+          { "name": "system", "color": "gray" }
+        ]
+      }
+    },
+    "Message": { "rich_text": {} },
+    "RelatedTask": {
+      "relation": {
+        "database_id": "{{TASKS_DATABASE_ID}}",
+        "single_property": {}
+      }
+    },
+    "Timestamp": { "date": {} }
+  }
+}

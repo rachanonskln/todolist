@@ -1,0 +1,22 @@
+{
+  "_comment": "Stores per-user config, including encrypted-at-rest secrets. Consider a proper secrets manager (see docs/ARCHITECTURE.md, section Security) instead of raw rich_text for NotionApiKey/LineChannelAccessToken in production.",
+  "parent": { "type": "page_id", "page_id": "{{PARENT_PAGE_ID}}" },
+  "title": [{ "type": "text", "text": { "content": "Users" } }],
+  "properties": {
+    "Name": { "title": {} },
+    "Email": { "email": {} },
+    "PasswordHash": { "rich_text": {} },
+    "LineUserId": { "rich_text": {} },
+    "NotionApiKey": { "rich_text": {} },
+    "LineChannelAccessToken": { "rich_text": {} },
+    "EmailIntegrationStatus": {
+      "select": {
+        "options": [
+          { "name": "connected", "color": "green" },
+          { "name": "disconnected", "color": "gray" }
+        ]
+      }
+    },
+    "GmailRefreshToken": { "rich_text": {} }
+  }
+}

@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply text-slate-700 antialiased;
+    font-family: "Inter", "Noto Sans Thai", system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  /* Animated rainbow-pastel backdrop shared by every full-page view.
+     Three blurred, floating blobs sit under a soft base gradient so the
+     glass panels above always have some color moving behind them. */
+  .app-background {
+    @apply fixed inset-0 -z-10 overflow-hidden bg-rainbow-pastel bg-300% animate-gradient-shift;
+  }
+
+  .app-background::before,
+  .app-background::after {
+    content: "";
+    @apply absolute rounded-full blur-3xl opacity-60 animate-float-slow;
+  }
+
+  .app-background::before {
+    @apply w-[38rem] h-[38rem] bg-pastel-sky -top-40 -left-32;
+  }
+
+  .app-background::after {
+    @apply w-[32rem] h-[32rem] bg-pastel-lilac bottom-[-10rem] right-[-8rem] animate-float;
+  }
+
+  /* Core "liquid glass" surface: translucent, blurred, with a soft inner
+     highlight to mimic light catching a curved glass edge. */
+  .glass-panel {
+    @apply relative rounded-glass border border-glass-border bg-glass-light
+      backdrop-blur-glass shadow-glass;
+    box-shadow:
+      0 8px 32px 0 rgba(31, 38, 135, 0.15),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .glass-panel-dark {
+    @apply relative rounded-glass border border-white/10 bg-glass-dark
+      backdrop-blur-glass text-white shadow-glass;
+  }
+
+  .glass-card {
+    @apply glass-panel p-5 transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg animate-pop-in;
+  }
+
+  .glass-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5
+      font-medium text-slate-700 border border-white/40 bg-white/50
+      backdrop-blur-glass shadow-glass transition-all duration-200
+      hover:bg-white/70 hover:shadow-lg active:scale-95;
+  }
+
+  .glass-button-primary {
+    @apply glass-button text-white border-white/30 bg-rainbow-pastel bg-300%
+      animate-gradient-shift bg-[length:300%_300%];
+  }
+
+  .glass-input {
+    @apply w-full rounded-2xl border border-white/50 bg-white/40 px-4 py-2.5
+      text-slate-700 placeholder:text-slate-400 backdrop-blur-glass
+      outline-none transition focus:border-pastel-sky focus:bg-white/60
+      focus:ring-2 focus:ring-pastel-sky/60;
+  }
+
+  /* Shimmering sweep used on skeleton loaders / progress bars. */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.2) 25%,
+      rgba(255, 255, 255, 0.6) 50%,
+      rgba(255, 255, 255, 0.2) 75%
+    );
+    background-size: 200% 100%;
+    @apply animate-shimmer;
+  }
+}

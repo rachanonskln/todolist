@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "todo-frontend",
+      "runtimeExecutable": "/private/tmp/claude-501/-Users-rachax-Desktop-Cowork-My/197a2dc5-46ea-4afb-9167-06ada79f680f/scratchpad/node/node-v24.18.0-darwin-arm64/bin/node",
+      "runtimeArgs": [
+        "/Users/rachax/Desktop/Cowork/My/To do list/app/frontend/node_modules/vite/bin/vite.js",
+        "/Users/rachax/Desktop/Cowork/My/To do list/app/frontend",
+        "--host",
+        "--port",
+        "5173"
+      ],
+      "port": 5173
+    }
+  ]
+}

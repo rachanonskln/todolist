@@ -1,0 +1,8 @@
+# Cloudflare Pages project config for the frontend static build.
+# Manual deploy (once `wrangler login` is done locally):
+#   npm run build && npx wrangler pages deploy dist --project-name=aurora-tasks
+# Automated deploy: see ../../.github/workflows/deploy-frontend.yml, which
+# runs this same build + deploy on every push to main via GitHub Actions.
+name = "aurora-tasks"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-01-01"

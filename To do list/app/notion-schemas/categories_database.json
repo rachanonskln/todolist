@@ -1,0 +1,9 @@
+{
+  "_comment": "Create this database first — Tasks and other databases reference it by id.",
+  "parent": { "type": "page_id", "page_id": "{{PARENT_PAGE_ID}}" },
+  "title": [{ "type": "text", "text": { "content": "Categories" } }],
+  "properties": {
+    "Name": { "title": {} },
+    "Color": { "rich_text": {} }
+  }
+}
