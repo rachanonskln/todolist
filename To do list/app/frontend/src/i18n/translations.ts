@@ -39,6 +39,12 @@ export interface TranslationShape {
       unhealthy: string;
     };
   };
+  aiReview: {
+    title: string;
+    subtitle: string;
+    approve: string;
+    reject: string;
+  };
   priority: { low: string; medium: string; high: string };
   status: { pending: string; in_progress: string; completed: string };
   calendar: {
@@ -136,6 +142,12 @@ export const translations: Record<Locale, TranslationShape> = {
         unhealthy: "Unhealthy",
       },
     },
+    aiReview: {
+      title: "AI Suggestions — Needs Your Review",
+      subtitle: "Extracted automatically from email/LINE. Approve or reject each one.",
+      approve: "Approve",
+      reject: "Reject",
+    },
     priority: { low: "Low", medium: "Medium", high: "High" },
     status: { pending: "Pending", in_progress: "In progress", completed: "Completed" },
     calendar: {
@@ -228,6 +240,12 @@ export const translations: Record<Locale, TranslationShape> = {
         unhealthySensitive: "เริ่มมีผลกระทบต่อกลุ่มเสี่ยง",
         unhealthy: "มีผลกระทบต่อสุขภาพ",
       },
+    },
+    aiReview: {
+      title: "งานที่ AI แนะนำ — รอตรวจสอบ",
+      subtitle: "ดึงมาจากอีเมล/LINE อัตโนมัติ กดยืนยันหรือปฏิเสธแต่ละรายการ",
+      approve: "ยืนยัน",
+      reject: "ปฏิเสธ",
     },
     priority: { low: "ต่ำ", medium: "ปานกลาง", high: "สูง" },
     status: { pending: "รอดำเนินการ", in_progress: "กำลังทำ", completed: "เสร็จแล้ว" },

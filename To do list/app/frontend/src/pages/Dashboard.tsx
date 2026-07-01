@@ -3,6 +3,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { PriorityBadge, StatusBadge } from "@/components/ui/Badge";
 import { LiveClock } from "@/components/dashboard/LiveClock";
 import { ForecastCard, Pm25Card } from "@/components/dashboard/WeatherWidgets";
+import { AiReviewCard } from "@/components/dashboard/AiReviewCard";
 import { CategoriesApi, TasksApi } from "@/lib/api";
 import { DEFAULT_COORDS, fetchWeather, type WeatherData } from "@/lib/weatherApi";
 import type { Category, Task } from "@/types/task";
@@ -72,18 +73,37 @@ export function Dashboard() {
 
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
 
+  // AI-suggested tasks that haven't been confirmed yet don't count as real
+  // to-dos — they're pulled out of the stats/list until approved.
+  const reviewTasks = useMemo(() => tasks.filter((t) => t.needsReview), [tasks]);
+  const confirmedTasks = useMemo(() => tasks.filter((t) => !t.needsReview), [tasks]);
+
   const stats = useMemo(() => {
-    const todayTasks = tasks.filter((t) => isToday(parseISO(t.startDate)));
-    const pending = tasks.filter((t) => t.status !== "completed");
-    const completed = tasks.filter((t) => t.status === "completed");
-    const highPriority = tasks.filter(
+    const todayTasks = confirmedTasks.filter((t) => isToday(parseISO(t.startDate)));
+    const pending = confirmedTasks.filter((t) => t.status !== "completed");
+    const completed = confirmedTasks.filter((t) => t.status === "completed");
+    const highPriority = confirmedTasks.filter(
       (t) => t.priority === "high" && t.status !== "completed",
     );
     return { todayTasks, pending, completed, highPriority };
-  }, [tasks]);
+  }, [confirmedTasks]);
+
+  const handleApproveReview = (task: Task) => {
+    TasksApi.update(task.id, { needsReview: false })
+      .then(() => setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, needsReview: false } : t))))
+      .catch((err) => console.error("Failed to approve suggested task", err));
+  };
+
+  const handleRejectReview = (task: Task) => {
+    TasksApi.remove(task.id)
+      .then(() => setTasks((prev) => prev.filter((t) => t.id !== task.id)))
+      .catch((err) => console.error("Failed to reject suggested task", err));
+  };
 
   return (
     <div className="flex flex-col gap-6">
+      <AiReviewCard tasks={reviewTasks} onApprove={handleApproveReview} onReject={handleRejectReview} />
+
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <SummaryStat label={t.dashboard.today} value={stats.todayTasks.length} accent="sky" />
         <SummaryStat label={t.dashboard.pending} value={stats.pending.length} accent="lemon" />

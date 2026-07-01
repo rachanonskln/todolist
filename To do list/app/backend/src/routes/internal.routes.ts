@@ -34,10 +34,14 @@ internalRouter.post("/ai/tasks", async (req, res, next) => {
       priority: input.priority,
       categoryId: input.categoryId,
       lineUserId: input.lineUserId,
+      // AI-extracted tasks always start in the review queue — the user
+      // confirms or discards them from the Dashboard before they count as
+      // real to-dos, since extraction from free text can be wrong.
+      needsReview: true,
     });
     await LogsRepository.record({
       source: input.source,
-      message: `AI created task "${task.title}"`,
+      message: `AI suggested task "${task.title}" (pending review)`,
       relatedTaskId: task.id,
     });
     res.status(201).json(task);

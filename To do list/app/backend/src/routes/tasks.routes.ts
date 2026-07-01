@@ -14,6 +14,7 @@ const taskInputSchema = z.object({
   categoryId: z.string().optional(),
   lineUserId: z.string().optional(),
   assignee: z.string().optional(),
+  needsReview: z.boolean().optional(),
   reminderMinutesBefore: z.number().int().min(0).optional(),
 });
 

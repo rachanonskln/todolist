@@ -18,6 +18,9 @@ export interface TaskRecord {
   categoryId?: string;
   lineUserId?: string;
   assignee?: string;
+  /** True for tasks the AI module created from an email/LINE message that
+   * haven't been confirmed by the user yet — see internal.routes.ts. */
+  needsReview: boolean;
   reminderMinutesBefore: number;
 }
 
@@ -31,6 +34,7 @@ export interface TaskInput {
   categoryId?: string;
   lineUserId?: string;
   assignee?: string;
+  needsReview?: boolean;
   reminderMinutesBefore?: number;
 }
 
@@ -48,6 +52,7 @@ function mapPageToTask(page: PageObjectResponse): TaskRecord {
     categoryId: p.Category?.relation?.[0]?.id,
     lineUserId: p.LineUserId?.rich_text?.[0]?.plain_text || undefined,
     assignee: p.Assignee?.rich_text?.[0]?.plain_text || undefined,
+    needsReview: p.NeedsReview?.checkbox ?? false,
     reminderMinutesBefore: p.ReminderMinutesBefore?.number ?? 30,
   };
 }
@@ -77,6 +82,9 @@ function taskToProperties(input: Partial<TaskInput>) {
   }
   if (input.assignee !== undefined) {
     props.Assignee = { rich_text: [{ text: { content: input.assignee } }] };
+  }
+  if (input.needsReview !== undefined) {
+    props.NeedsReview = { checkbox: input.needsReview };
   }
   if (input.reminderMinutesBefore !== undefined) {
     props.ReminderMinutesBefore = { number: input.reminderMinutesBefore };
