@@ -27,7 +27,9 @@ export function TaskForm() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    CategoriesApi.list().then(setCategories);
+    CategoriesApi.list()
+      .then(setCategories)
+      .catch((err) => console.error("Failed to load categories", err));
     if (isEdit && id) {
       TasksApi.get(id).then((task) =>
         setForm({

@@ -29,7 +29,9 @@ export function CalendarView() {
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
 
   useEffect(() => {
-    TasksApi.list().then(setTasks);
+    TasksApi.list()
+      .then(setTasks)
+      .catch((err) => console.error("Failed to load tasks", err));
   }, []);
 
   const days = useMemo(() => {

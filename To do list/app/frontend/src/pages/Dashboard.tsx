@@ -31,6 +31,10 @@ export function Dashboard() {
   useEffect(() => {
     TasksApi.list()
       .then(setTasks)
+      .catch((err) => {
+        console.error("Failed to load tasks", err);
+        setTasks([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 

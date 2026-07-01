@@ -15,9 +15,21 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// If there's no backend behind `apiBaseUrl` yet, a request to an unmapped
+// path can still resolve with HTTP 200 (e.g. a static host's SPA fallback
+// serving index.html instead of a 404/JSON). Without this check, that HTML
+// string would flow straight into `.filter()`-ing UI code and crash with a
+// cryptic "t.filter is not a function" instead of a catchable rejection.
+function assertArray<T>(data: unknown, context: string): T[] {
+  if (!Array.isArray(data)) {
+    throw new Error(`Expected an array from ${context}, got: ${typeof data}`);
+  }
+  return data as T[];
+}
+
 export const TasksApi = {
   list: (params?: { status?: string; categoryId?: string; q?: string }) =>
-    api.get<Task[]>("/tasks", { params }).then((r) => r.data),
+    api.get<Task[]>("/tasks", { params }).then((r) => assertArray<Task>(r.data, "GET /tasks")),
   get: (id: string) => api.get<Task>(`/tasks/${id}`).then((r) => r.data),
   create: (input: TaskInput) =>
     api.post<Task>("/tasks", input).then((r) => r.data),
@@ -27,7 +39,8 @@ export const TasksApi = {
 };
 
 export const CategoriesApi = {
-  list: () => api.get<Category[]>("/categories").then((r) => r.data),
+  list: () =>
+    api.get<Category[]>("/categories").then((r) => assertArray<Category>(r.data, "GET /categories")),
   create: (input: Omit<Category, "id">) =>
     api.post<Category>("/categories", input).then((r) => r.data),
 };
