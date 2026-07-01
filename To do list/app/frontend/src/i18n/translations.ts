@@ -81,18 +81,19 @@ export interface TranslationShape {
     save: string;
     saving: string;
   };
-  settings: {
-    integrations: string;
-    notionApiKey: string;
-    lineToken: string;
-    lineTokenPlaceholder: string;
-    emailMonitoring: string;
-    connected: string;
-    notConnected: string;
-    connectGmail: string;
-    disconnect: string;
+  profile: {
+    title: string;
+    changePhoto: string;
+    removePhoto: string;
+    avatarAlt: string;
+    avatarError: string;
+    email: string;
+    name: string;
+    namePlaceholder: string;
     save: string;
+    saving: string;
     saved: string;
+    saveError: string;
   };
   login: {
     title: string;
@@ -115,7 +116,7 @@ export const translations: Record<Locale, TranslationShape> = {
       tasks: "Tasks",
       calendar: "Calendar",
       newTask: "New Task",
-      settings: "Settings",
+      settings: "Profile",
       brand: "Rachanon BLNS Task",
     },
     tasksList: {
@@ -192,18 +193,19 @@ export const translations: Record<Locale, TranslationShape> = {
       save: "Save Task",
       saving: "Saving...",
     },
-    settings: {
-      integrations: "Integrations",
-      notionApiKey: "Notion API Key",
-      lineToken: "LINE Channel Access Token",
-      lineTokenPlaceholder: "Long-lived channel access token",
-      emailMonitoring: "Email Monitoring",
-      connected: "Connected via OAuth2",
-      notConnected: "Not connected",
-      connectGmail: "Connect Gmail",
-      disconnect: "Disconnect",
-      save: "Save Settings",
+    profile: {
+      title: "Profile",
+      changePhoto: "Change photo",
+      removePhoto: "Remove photo",
+      avatarAlt: "Profile photo",
+      avatarError: "Couldn't update your photo — try a different image.",
+      email: "Email",
+      name: "Name",
+      namePlaceholder: "e.g. Rachanon",
+      save: "Save",
+      saving: "Saving...",
       saved: "Saved ✓",
+      saveError: "Couldn't save — try again.",
     },
     login: {
       title: "Welcome back",
@@ -222,7 +224,7 @@ export const translations: Record<Locale, TranslationShape> = {
       tasks: "งานทั้งหมด",
       calendar: "ปฏิทิน",
       newTask: "เพิ่มงาน",
-      settings: "ตั้งค่า",
+      settings: "โปรไฟล์",
       brand: "Rachanon BLNS Task",
     },
     tasksList: {
@@ -299,18 +301,19 @@ export const translations: Record<Locale, TranslationShape> = {
       save: "บันทึกงาน",
       saving: "กำลังบันทึก...",
     },
-    settings: {
-      integrations: "การเชื่อมต่อ",
-      notionApiKey: "Notion API Key",
-      lineToken: "LINE Channel Access Token",
-      lineTokenPlaceholder: "Long-lived channel access token",
-      emailMonitoring: "ระบบตรวจอีเมล",
-      connected: "เชื่อมต่อผ่าน OAuth2 แล้ว",
-      notConnected: "ยังไม่ได้เชื่อมต่อ",
-      connectGmail: "เชื่อมต่อ Gmail",
-      disconnect: "ยกเลิกการเชื่อมต่อ",
-      save: "บันทึกการตั้งค่า",
+    profile: {
+      title: "โปรไฟล์",
+      changePhoto: "เปลี่ยนรูปภาพ",
+      removePhoto: "ลบรูปภาพ",
+      avatarAlt: "รูปโปรไฟล์",
+      avatarError: "อัปเดตรูปไม่สำเร็จ ลองใช้รูปอื่น",
+      email: "อีเมล",
+      name: "ชื่อ",
+      namePlaceholder: "เช่น รชานนท์",
+      save: "บันทึก",
+      saving: "กำลังบันทึก...",
       saved: "บันทึกแล้ว ✓",
+      saveError: "บันทึกไม่สำเร็จ ลองอีกครั้ง",
     },
     login: {
       title: "ยินดีต้อนรับกลับมา",

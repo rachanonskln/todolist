@@ -4,7 +4,7 @@ import { NotificationBell } from "./NotificationBell";
 
 export function Navbar() {
   const { locale, setLocale, t } = useLocale();
-  const { logout } = useAuth();
+  const { logout, profile } = useAuth();
 
   return (
     <header className="glass-panel relative z-30 mb-6 flex items-center justify-between px-5 py-3">
@@ -29,7 +29,11 @@ export function Navbar() {
         >
           🚪
         </button>
-        <div className="h-9 w-9 rounded-full bg-rainbow-pastel bg-300% animate-gradient-shift" />
+        {profile?.avatarUrl ? (
+          <img src={profile.avatarUrl} alt={t.profile.avatarAlt} className="h-9 w-9 rounded-full object-cover" />
+        ) : (
+          <div className="h-9 w-9 rounded-full bg-rainbow-pastel bg-300% animate-gradient-shift" />
+        )}
       </div>
     </header>
   );

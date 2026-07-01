@@ -9,7 +9,7 @@ function useNavItems() {
     { to: "/tasks", label: t.nav.tasks, icon: "📋" },
     { to: "/calendar", label: t.nav.calendar, icon: "🗓️" },
     { to: "/tasks/new", label: t.nav.newTask, icon: "➕" },
-    { to: "/settings", label: t.nav.settings, icon: "⚙️" },
+    { to: "/settings", label: t.nav.settings, icon: "👤" },
   ];
 }
 

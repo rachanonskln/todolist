@@ -65,6 +65,18 @@ export const TasksApi = {
       .then((r) => assertArray<string>(r.data, "GET /tasks/assignees")),
 };
 
+export interface Profile {
+  email: string;
+  name?: string;
+  avatarUrl?: string;
+}
+
+export const ProfileApi = {
+  get: () => api.get<Profile>("/profile").then((r) => r.data),
+  update: (input: Partial<Pick<Profile, "name" | "avatarUrl">>) =>
+    api.patch<Profile>("/profile", input).then((r) => r.data),
+};
+
 export const CategoriesApi = {
   list: () =>
     api.get<Category[]>("/categories").then((r) => assertArray<Category>(r.data, "GET /categories")),
