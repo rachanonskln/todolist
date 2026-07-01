@@ -17,7 +17,7 @@ from config import settings
 
 genai.configure(api_key=settings.gemini_api_key)
 
-_MODEL_NAME = "gemini-1.5-flash"
+_MODEL_NAME = "gemini-2.5-flash"
 
 _EXTRACTION_PROMPT = """You are a task-extraction assistant embedded in a to-do app.
 Read the SOURCE TEXT and identify any concrete tasks, deadlines, or events a
