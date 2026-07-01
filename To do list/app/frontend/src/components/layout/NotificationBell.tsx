@@ -97,7 +97,8 @@ export function NotificationBell() {
 
       {open && (
         <div
-          className="glass-panel absolute right-0 top-12 z-20 w-80 max-w-[90vw] p-3 shadow-xl"
+          className="glass-panel absolute right-0 top-12 z-20 w-80 max-w-[90vw] !bg-white/95
+            p-3 shadow-xl backdrop-blur-xl"
         >
           <div className="mb-2 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-slate-700">{t.notifications.title}</h3>
