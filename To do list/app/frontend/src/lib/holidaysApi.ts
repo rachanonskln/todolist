@@ -2,7 +2,7 @@ import { api } from "@/lib/api";
 
 export interface Holiday {
   date: string; // ISO date (yyyy-mm-dd)
-  name: string;
+  name: { en: string; th: string };
 }
 
 let cached: Promise<Holiday[]> | null = null;

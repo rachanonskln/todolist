@@ -86,7 +86,7 @@ export function CalendarView() {
               <button
                 key={day.toISOString()}
                 onClick={() => setSelectedDay(day)}
-                title={holiday?.name}
+                title={holiday?.name[locale]}
                 className={clsx(
                   "flex h-20 flex-col items-start rounded-2xl border border-white/30 p-2 text-left transition",
                   inMonth ? "bg-white/40" : "bg-white/10 text-slate-400",
@@ -100,7 +100,7 @@ export function CalendarView() {
                   {holiday && <span aria-hidden>🇹🇭</span>}
                 </span>
                 {holiday && (
-                  <span className="line-clamp-1 text-[10px] text-rose-500">{holiday.name}</span>
+                  <span className="line-clamp-1 text-[10px] text-rose-500">{holiday.name[locale]}</span>
                 )}
                 <div className="mt-1 flex flex-wrap gap-1">
                   {dayTasks.slice(0, 3).map((task) => (
@@ -127,7 +127,7 @@ export function CalendarView() {
         </h3>
         {selectedDay && holidayOn(selectedDay) && (
           <p className="mb-3 rounded-xl bg-pastel-pink/30 px-3 py-2 text-sm text-rose-600">
-            🇹🇭 {holidayOn(selectedDay)!.name}
+            🇹🇭 {holidayOn(selectedDay)!.name[locale]}
           </p>
         )}
         <ul className="flex flex-col gap-2">
