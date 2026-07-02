@@ -14,6 +14,9 @@ export interface TranslationShape {
     allPriorities: string;
     allCategories: string;
     noResults: string;
+    showArchived: string;
+    showActive: string;
+    archivedBadge: string;
   };
   navbar: {
     greeting: string;
@@ -80,6 +83,10 @@ export interface TranslationShape {
     cancel: string;
     save: string;
     saving: string;
+    archive: string;
+    unarchive: string;
+    delete: string;
+    confirmDelete: string;
   };
   profile: {
     title: string;
@@ -126,6 +133,9 @@ export const translations: Record<Locale, TranslationShape> = {
       allPriorities: "All priorities",
       allCategories: "All categories",
       noResults: "No tasks match your filters.",
+      showArchived: "Show archived",
+      showActive: "Show active",
+      archivedBadge: "Archived",
     },
     navbar: {
       greeting: "Good to see you 👋",
@@ -192,6 +202,10 @@ export const translations: Record<Locale, TranslationShape> = {
       cancel: "Cancel",
       save: "Save Task",
       saving: "Saving...",
+      archive: "Archive",
+      unarchive: "Unarchive",
+      delete: "Delete",
+      confirmDelete: "Delete this task permanently? This can't be undone.",
     },
     profile: {
       title: "Profile",
@@ -234,6 +248,9 @@ export const translations: Record<Locale, TranslationShape> = {
       allPriorities: "ทุกความสำคัญ",
       allCategories: "ทุกหมวดหมู่",
       noResults: "ไม่พบงานที่ตรงกับตัวกรอง",
+      showArchived: "ดูงานที่เก็บถาวร",
+      showActive: "กลับไปงานปัจจุบัน",
+      archivedBadge: "เก็บถาวรแล้ว",
     },
     navbar: {
       greeting: "ยินดีต้อนรับกลับมา 👋",
@@ -300,6 +317,10 @@ export const translations: Record<Locale, TranslationShape> = {
       cancel: "ยกเลิก",
       save: "บันทึกงาน",
       saving: "กำลังบันทึก...",
+      archive: "เก็บถาวร",
+      unarchive: "นำออกจากที่เก็บถาวร",
+      delete: "ลบถาวร",
+      confirmDelete: "ลบงานนี้ถาวรใช่ไหม? การลบนี้กู้คืนไม่ได้",
     },
     profile: {
       title: "โปรไฟล์",

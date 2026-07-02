@@ -21,6 +21,9 @@ export interface TaskRecord {
   /** True for tasks the AI module created from an email/LINE message that
    * haven't been confirmed by the user yet — see internal.routes.ts. */
   needsReview: boolean;
+  /** Archived tasks stay in the database but are hidden from the default
+   * views — the user's "done and past, keep don't delete" bucket. */
+  archived: boolean;
   reminderMinutesBefore: number;
   /** Id of the mirrored Google Calendar event, if Calendar sync is
    * configured — lets updates/deletes target the right event instead of
@@ -39,6 +42,7 @@ export interface TaskInput {
   lineUserId?: string;
   assignee?: string;
   needsReview?: boolean;
+  archived?: boolean;
   reminderMinutesBefore?: number;
   googleEventId?: string;
 }
@@ -58,6 +62,7 @@ function mapPageToTask(page: PageObjectResponse): TaskRecord {
     lineUserId: p.LineUserId?.rich_text?.[0]?.plain_text || undefined,
     assignee: p.Assignee?.rich_text?.[0]?.plain_text || undefined,
     needsReview: p.NeedsReview?.checkbox ?? false,
+    archived: p.Archived?.checkbox ?? false,
     reminderMinutesBefore: p.ReminderMinutesBefore?.number ?? 30,
     googleEventId: p.GoogleEventId?.rich_text?.[0]?.plain_text || undefined,
   };
@@ -92,6 +97,9 @@ function taskToProperties(input: Partial<TaskInput>) {
   if (input.needsReview !== undefined) {
     props.NeedsReview = { checkbox: input.needsReview };
   }
+  if (input.archived !== undefined) {
+    props.Archived = { checkbox: input.archived };
+  }
   if (input.reminderMinutesBefore !== undefined) {
     props.ReminderMinutesBefore = { number: input.reminderMinutesBefore };
   }
@@ -107,8 +115,12 @@ export const TasksRepository = {
     categoryId?: string;
     priority?: TaskPriority;
     q?: string;
+    archived?: boolean;
   }) {
     const andFilters: any[] = [];
+    // Default views hide archived tasks; pass archived:true to list only the
+    // archived bucket instead.
+    andFilters.push({ property: "Archived", checkbox: { equals: filter?.archived ?? false } });
     if (filter?.status) {
       andFilters.push({ property: "Status", select: { equals: filter.status } });
     }

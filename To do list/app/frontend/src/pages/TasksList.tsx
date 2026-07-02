@@ -21,6 +21,7 @@ export function TasksList() {
   const [priority, setPriority] = useState<TaskPriority | "">("");
   const [categoryId, setCategoryId] = useState("");
   const [q, setQ] = useState("");
+  const [showArchived, setShowArchived] = useState(false);
 
   useEffect(() => {
     CategoriesApi.list()
@@ -42,6 +43,7 @@ export function TasksList() {
       priority: priority || undefined,
       categoryId: categoryId || undefined,
       q: debouncedQ || undefined,
+      archived: showArchived,
     })
       .then(setTasks)
       .catch((err) => {
@@ -49,7 +51,7 @@ export function TasksList() {
         setTasks([]);
       })
       .finally(() => setLoading(false));
-  }, [status, priority, categoryId, debouncedQ]);
+  }, [status, priority, categoryId, debouncedQ, showArchived]);
 
   const categoryById = useMemo(
     () => new Map(categories.map((c) => [c.id, c])),
@@ -59,7 +61,16 @@ export function TasksList() {
   return (
     <div className="flex flex-col gap-4">
       <GlassCard>
-        <h2 className="mb-4 text-base font-semibold text-slate-700">{t.tasksList.title}</h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-slate-700">{t.tasksList.title}</h2>
+          <button
+            type="button"
+            onClick={() => setShowArchived((v) => !v)}
+            className="text-sm font-medium text-slate-500 underline hover:text-slate-700"
+          >
+            {showArchived ? t.tasksList.showActive : t.tasksList.showArchived}
+          </button>
+        </div>
 
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           <input

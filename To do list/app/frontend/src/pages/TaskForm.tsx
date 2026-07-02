@@ -41,6 +41,8 @@ export function TaskForm() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [assigneeOptions, setAssigneeOptions] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const [archived, setArchived] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     CategoriesApi.list()
@@ -50,7 +52,7 @@ export function TaskForm() {
       .then(setAssigneeOptions)
       .catch((err) => console.error("Failed to load assignees", err));
     if (isEdit && id) {
-      TasksApi.get(id).then((task) =>
+      TasksApi.get(id).then((task) => {
         setForm({
           title: task.title,
           description: task.description ?? "",
@@ -62,8 +64,9 @@ export function TaskForm() {
           lineUserId: task.lineUserId ?? "",
           assignee: task.assignee ?? "",
           reminderMinutesBefore: task.reminderMinutesBefore ?? 30,
-        }),
-      );
+        });
+        setArchived(task.archived ?? false);
+      });
     }
   }, [id, isEdit]);
 
@@ -82,6 +85,30 @@ export function TaskForm() {
       navigate("/");
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Archiving keeps the task in the database but hides it from the active
+  // views — the user's "done and past, keep don't delete" bucket.
+  const handleArchiveToggle = async () => {
+    if (!id) return;
+    setBusy(true);
+    try {
+      await TasksApi.update(id, { archived: !archived });
+      navigate(-1);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!id || !window.confirm(t.taskForm.confirmDelete)) return;
+    setBusy(true);
+    try {
+      await TasksApi.remove(id);
+      navigate(-1);
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -217,7 +244,23 @@ export function TaskForm() {
           <p className="mt-1 text-xs text-slate-400">{t.taskForm.lineUserIdHint}</p>
         </div>
 
-        <div className="mt-2 flex justify-end gap-3">
+        <div className="mt-2 flex flex-wrap items-center justify-end gap-3">
+          {isEdit && (
+            <>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={busy}
+                className="mr-auto text-sm font-medium text-rose-500 hover:text-rose-600
+                  disabled:opacity-50"
+              >
+                {t.taskForm.delete}
+              </button>
+              <GlassButton type="button" onClick={handleArchiveToggle} disabled={busy}>
+                {archived ? `📤 ${t.taskForm.unarchive}` : `📥 ${t.taskForm.archive}`}
+              </GlassButton>
+            </>
+          )}
           <GlassButton type="button" onClick={() => navigate(-1)}>
             {t.taskForm.cancel}
           </GlassButton>

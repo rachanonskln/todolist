@@ -51,8 +51,13 @@ export const AuthApi = {
 };
 
 export const TasksApi = {
-  list: (params?: { status?: string; categoryId?: string; priority?: string; q?: string }) =>
-    api.get<Task[]>("/tasks", { params }).then((r) => assertArray<Task>(r.data, "GET /tasks")),
+  list: (params?: {
+    status?: string;
+    categoryId?: string;
+    priority?: string;
+    q?: string;
+    archived?: boolean;
+  }) => api.get<Task[]>("/tasks", { params }).then((r) => assertArray<Task>(r.data, "GET /tasks")),
   get: (id: string) => api.get<Task>(`/tasks/${id}`).then((r) => r.data),
   create: (input: TaskInput) =>
     api.post<Task>("/tasks", input).then((r) => r.data),

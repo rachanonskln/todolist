@@ -29,22 +29,25 @@ const taskInputSchema = z.object({
   lineUserId: z.string().optional(),
   assignee: z.string().optional(),
   needsReview: z.boolean().optional(),
+  archived: z.boolean().optional(),
   reminderMinutesBefore: z.number().int().min(0).optional(),
 });
 
 tasksRouter.get("/", async (req, res, next) => {
   try {
-    const { status, categoryId, priority, q } = req.query as {
+    const { status, categoryId, priority, q, archived } = req.query as {
       status?: string;
       categoryId?: string;
       priority?: string;
       q?: string;
+      archived?: string;
     };
     const tasks = await TasksRepository.list({
       status: status as any,
       categoryId,
       priority: priority as any,
       q,
+      archived: archived === "true",
     });
     res.json(tasks);
   } catch (err) {

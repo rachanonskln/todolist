@@ -23,6 +23,7 @@ export interface Task {
   lineUserId?: string;
   assignee?: string;
   needsReview?: boolean;
+  archived?: boolean;
   reminderMinutesBefore?: number;
 }
 
