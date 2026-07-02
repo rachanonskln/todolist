@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { PriorityBadge, StatusBadge } from "@/components/ui/Badge";
 import { CategoriesApi, TasksApi } from "@/lib/api";
@@ -11,6 +12,7 @@ import { format, parseISO } from "date-fns";
  * only ever shows today's tasks and summary counts. */
 export function TasksList() {
   const { t } = useLocale();
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -120,7 +122,8 @@ export function TasksList() {
             return (
               <li
                 key={task.id}
-                className="flex items-center justify-between rounded-2xl border border-white/40
+                onClick={() => navigate(`/tasks/${task.id}/edit`)}
+                className="flex cursor-pointer items-center justify-between rounded-2xl border border-white/40
                   bg-white/40 px-4 py-3 backdrop-blur-glass transition hover:bg-white/60"
               >
                 <div>

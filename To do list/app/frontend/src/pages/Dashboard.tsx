@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { PriorityBadge, StatusBadge } from "@/components/ui/Badge";
 import { LiveClock } from "@/components/dashboard/LiveClock";
@@ -29,6 +30,7 @@ function SummaryStat({
 
 export function Dashboard() {
   const { t } = useLocale();
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -143,7 +145,8 @@ export function Dashboard() {
             return (
               <li
                 key={task.id}
-                className="flex items-center justify-between rounded-2xl border border-white/40
+                onClick={() => navigate(`/tasks/${task.id}/edit`)}
+                className="flex cursor-pointer items-center justify-between rounded-2xl border border-white/40
                   bg-white/40 px-4 py-3 backdrop-blur-glass transition hover:bg-white/60"
               >
                 <div>

@@ -6,6 +6,19 @@ import { CategoriesApi, TasksApi } from "@/lib/api";
 import type { Category, TaskInput, TaskPriority, TaskStatus } from "@/types/task";
 import { useLocale } from "@/i18n/LocaleContext";
 
+/** <input type="datetime-local"> only accepts "yyyy-MM-ddTHH:mm" — the API
+ * returns full ISO strings like "2026-07-02T03:05:00.000+00:00", which the
+ * input silently rejects (leaving the field blank on edit).
+ *
+ * We take the literal wall-clock components (first 16 chars) rather than
+ * converting through a timezone: the create flow already stores the raw
+ * datetime-local value as-is, so reading it back the same naive way keeps an
+ * edit round-trip stable instead of drifting the time by the browser's UTC
+ * offset each save. */
+function toDateTimeLocal(iso: string): string {
+  return iso ? iso.slice(0, 16) : "";
+}
+
 const emptyForm: TaskInput = {
   title: "",
   description: "",
@@ -41,8 +54,8 @@ export function TaskForm() {
         setForm({
           title: task.title,
           description: task.description ?? "",
-          startDate: task.startDate,
-          endDate: task.endDate,
+          startDate: toDateTimeLocal(task.startDate),
+          endDate: toDateTimeLocal(task.endDate),
           status: task.status,
           priority: task.priority,
           categoryId: task.categoryId,

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   addMonths,
   eachDayOfInterval,
@@ -23,6 +24,7 @@ import { useLocale } from "@/i18n/LocaleContext";
 
 export function CalendarView() {
   const { locale, t } = useLocale();
+  const navigate = useNavigate();
   const dateLocale = locale === "th" ? thLocale : enUS;
 
   const [cursor, setCursor] = useState(new Date());
@@ -132,7 +134,11 @@ export function CalendarView() {
         )}
         <ul className="flex flex-col gap-2">
           {(selectedDay ? tasksByDay(selectedDay) : []).map((t) => (
-            <li key={t.id} className="rounded-xl bg-white/40 p-3 text-sm">
+            <li
+              key={t.id}
+              onClick={() => navigate(`/tasks/${t.id}/edit`)}
+              className="cursor-pointer rounded-xl bg-white/40 p-3 text-sm transition hover:bg-white/70"
+            >
               <p className="font-medium text-slate-800">{t.title}</p>
               <p className="text-xs text-slate-500">
                 {format(parseISO(t.startDate), "HH:mm")} –{" "}

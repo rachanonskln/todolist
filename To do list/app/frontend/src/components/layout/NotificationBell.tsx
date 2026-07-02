@@ -9,6 +9,7 @@ const DISMISSED_KEY = "dismissedNotificationIds";
 
 interface NotificationItem {
   id: string;
+  taskId: string;
   kind: "review" | "dueSoon";
   title: string;
 }
@@ -49,7 +50,12 @@ export function NotificationBell() {
   const items = useMemo<NotificationItem[]>(() => {
     const reviewItems = tasks
       .filter((task) => task.needsReview)
-      .map((task) => ({ id: `review-${task.id}`, kind: "review" as const, title: task.title }));
+      .map((task) => ({
+        id: `review-${task.id}`,
+        taskId: task.id,
+        kind: "review" as const,
+        title: task.title,
+      }));
 
     const dueSoonItems = tasks
       .filter((task) => {
@@ -57,7 +63,12 @@ export function NotificationBell() {
         const hoursUntil = differenceInHours(parseISO(task.startDate), new Date());
         return hoursUntil >= -24 && hoursUntil <= 24;
       })
-      .map((task) => ({ id: `due-${task.id}`, kind: "dueSoon" as const, title: task.title }));
+      .map((task) => ({
+        id: `due-${task.id}`,
+        taskId: task.id,
+        kind: "dueSoon" as const,
+        title: task.title,
+      }));
 
     return [...reviewItems, ...dueSoonItems];
   }, [tasks]);
@@ -73,7 +84,9 @@ export function NotificationBell() {
   const clearAll = () => persistDismissed(new Set([...dismissed, ...visible.map((v) => v.id)]));
 
   const goTo = (item: NotificationItem) => {
-    navigate(item.kind === "review" ? "/" : "/tasks");
+    // Review items still route to the Dashboard where the approve/reject card
+    // lives; a due-soon item opens that task's detail/edit page directly.
+    navigate(item.kind === "review" ? "/" : `/tasks/${item.taskId}/edit`);
     setOpen(false);
   };
 
