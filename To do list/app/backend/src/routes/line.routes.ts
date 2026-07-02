@@ -55,7 +55,7 @@ lineRouter.post("/webhook", lineWebhookMiddleware, async (req, res) => {
           }),
         });
         const result = (await response.json()) as { tasks?: ConyNotedTask[] };
-        await replyAsCony(event.replyToken, result.tasks ?? []);
+        await replyAsCony(event.replyToken, event.source.userId, result.tasks ?? []);
       }
 
       if (isTrackableFileMessage(event)) {
@@ -81,7 +81,7 @@ lineRouter.post("/webhook", lineWebhookMiddleware, async (req, res) => {
           }),
         });
         const result = (await response.json()) as { tasks?: ConyNotedTask[] };
-        await replyAsCony(event.replyToken, result.tasks ?? []);
+        await replyAsCony(event.replyToken, event.source.userId, result.tasks ?? []);
       }
     } catch (err) {
       console.error("Failed to process LINE event", err);

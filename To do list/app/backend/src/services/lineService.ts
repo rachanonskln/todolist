@@ -112,7 +112,11 @@ function formatThaiDateTime(iso: string): string {
  * found nothing actionable), so sending a message into the chat never feels
  * like talking to a void.
  */
-export async function replyAsCony(replyToken: string, tasks: ConyNotedTask[]) {
+export async function replyAsCony(
+  replyToken: string,
+  userId: string | undefined,
+  tasks: ConyNotedTask[],
+) {
   const text =
     tasks.length > 0
       ? `รับทราบค่ะ Cony จดไว้ให้แล้ว ${tasks.length} รายการ 🐰📝\n` +
@@ -120,7 +124,16 @@ export async function replyAsCony(replyToken: string, tasks: ConyNotedTask[]) {
         `\n\nรายการเหล่านี้รอการยืนยันอยู่ที่หน้าแดชบอร์ดนะคะ กดยืนยันแล้ว Cony จะช่วยเตือนเมื่อใกล้ถึงเวลาค่ะ ✨`
       : `Cony อ่านข้อความแล้วค่ะ แต่ยังไม่เจองานที่ต้องจดนะคะ 🐰\nลองบอกรายละเอียดพร้อมวันเวลา เช่น "ส่งรายงานให้อาจารย์วันศุกร์นี้บ่าย 3" ได้เลยค่ะ`;
 
-  await lineClient.replyMessage(replyToken, { type: "text", text });
+  const message = { type: "text" as const, text };
+  try {
+    await lineClient.replyMessage(replyToken, message);
+  } catch (err) {
+    // A reply token expires quickly (~1 min). On the free tier a cold start
+    // can outlast it, so the reply fails with 400. Fall back to a push (which
+    // needs no token) so Cony still answers instead of the chat going silent.
+    if (!userId) throw err;
+    await lineClient.pushMessage(userId, message);
+  }
 }
 
 /**

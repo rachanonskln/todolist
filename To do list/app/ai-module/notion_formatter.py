@@ -5,6 +5,7 @@ which keeps a single source of truth for the database schema/property
 names and avoids two services fighting over Notion rate limits.
 """
 
+import asyncio
 from datetime import timedelta, datetime
 from typing import Literal, Optional
 
@@ -14,6 +15,13 @@ from config import settings
 from nlp_extractor import ExtractedTask
 
 DEFAULT_DURATION = timedelta(hours=1)
+
+# Both services run on Render's free tier and spin down independently. When a
+# LINE message wakes the ai-module, the backend may still be cold-starting, so
+# its router returns 502/503 for a few seconds before the app is up. Retry
+# those transient gateway errors instead of dropping the task.
+_RETRY_STATUSES = {502, 503, 504}
+_MAX_ATTEMPTS = 4
 
 
 def to_task_payload(
@@ -37,14 +45,27 @@ def to_task_payload(
 
 async def submit_task(payload: dict) -> dict:
     async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"{settings.backend_url}/internal/ai/tasks",
-            json=payload,
-            headers={"x-internal-key": settings.internal_api_key},
-            # Generous timeout: the backend runs on Render's free tier, which
-            # spins down when idle and takes ~50s to cold-start — a 10s timeout
-            # here made the whole pipeline 500 whenever the backend was asleep.
-            timeout=90.0,
-        )
-        response.raise_for_status()
-        return response.json()
+        last_error: Exception | None = None
+        for attempt in range(_MAX_ATTEMPTS):
+            response = await client.post(
+                f"{settings.backend_url}/internal/ai/tasks",
+                json=payload,
+                headers={"x-internal-key": settings.internal_api_key},
+                # Generous timeout: the backend cold-starts in ~50s on the free
+                # tier — a short timeout made the whole pipeline fail while it
+                # was still waking up.
+                timeout=90.0,
+            )
+            if response.status_code in _RETRY_STATUSES:
+                # Backend still cold-starting; wait and retry rather than
+                # losing the extracted task.
+                last_error = httpx.HTTPStatusError(
+                    f"backend returned {response.status_code}",
+                    request=response.request,
+                    response=response,
+                )
+                await asyncio.sleep(2 * (attempt + 1))
+                continue
+            response.raise_for_status()
+            return response.json()
+        raise last_error  # type: ignore[misc]
