@@ -93,6 +93,36 @@ export async function sendTaskReminder(task: TaskRecord) {
   await lineClient.pushMessage(task.lineUserId, buildTaskReminderFlex(task));
 }
 
+export interface ConyNotedTask {
+  title: string;
+  startDate: string;
+}
+
+function formatThaiDateTime(iso: string): string {
+  return new Date(iso).toLocaleString("th-TH", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Bangkok",
+  });
+}
+
+/**
+ * Replies in the voice of "Cony", the secretary persona the user asked for —
+ * confirming what got noted from their message (or nudging them when the AI
+ * found nothing actionable), so sending a message into the chat never feels
+ * like talking to a void.
+ */
+export async function replyAsCony(replyToken: string, tasks: ConyNotedTask[]) {
+  const text =
+    tasks.length > 0
+      ? `รับทราบค่ะ Cony จดไว้ให้แล้ว ${tasks.length} รายการ 🐰📝\n` +
+        tasks.map((t) => `• ${t.title}\n  ⏰ ${formatThaiDateTime(t.startDate)}`).join("\n") +
+        `\n\nรายการเหล่านี้รอการยืนยันอยู่ที่หน้าแดชบอร์ดนะคะ กดยืนยันแล้ว Cony จะช่วยเตือนเมื่อใกล้ถึงเวลาค่ะ ✨`
+      : `Cony อ่านข้อความแล้วค่ะ แต่ยังไม่เจองานที่ต้องจดนะคะ 🐰\nลองบอกรายละเอียดพร้อมวันเวลา เช่น "ส่งรายงานให้อาจารย์วันศุกร์นี้บ่าย 3" ได้เลยค่ะ`;
+
+  await lineClient.replyMessage(replyToken, { type: "text", text });
+}
+
 /**
  * Routes an incoming webhook event. Text messages are forwarded to the AI
  * Processing Module for entity extraction; postbacks (e.g. "Mark as done")

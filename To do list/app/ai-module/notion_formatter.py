@@ -41,7 +41,10 @@ async def submit_task(payload: dict) -> dict:
             f"{settings.backend_url}/internal/ai/tasks",
             json=payload,
             headers={"x-internal-key": settings.internal_api_key},
-            timeout=10.0,
+            # Generous timeout: the backend runs on Render's free tier, which
+            # spins down when idle and takes ~50s to cold-start — a 10s timeout
+            # here made the whole pipeline 500 whenever the backend was asleep.
+            timeout=90.0,
         )
         response.raise_for_status()
         return response.json()

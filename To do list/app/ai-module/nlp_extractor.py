@@ -31,6 +31,8 @@ Return ONLY a JSON array (no markdown fences) where each item matches:
   "priority": "low" | "medium" | "high"
 }}
 If there are no actionable tasks, return [].
+Write "title" and "description" in the SAME language as the source text
+(e.g. Thai source -> Thai title), do not translate.
 
 Current date/time for resolving relative dates (e.g. "next Friday"): {now}
 

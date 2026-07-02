@@ -6,6 +6,8 @@ import {
   isTrackableFileMessage,
   guessLineMimeType,
   lineClient,
+  replyAsCony,
+  type ConyNotedTask,
 } from "../services/lineService.js";
 import { TasksRepository, LogsRepository } from "../services/notionService.js";
 import { env } from "../config/env.js";
@@ -43,7 +45,7 @@ lineRouter.post("/webhook", lineWebhookMiddleware, async (req, res) => {
         // Hand the raw message off to the AI Processing Module for entity
         // extraction. The AI module authenticates back to /internal/tasks
         // with INTERNAL_API_KEY once it has structured data to save.
-        await fetch(`${env.aiModuleUrl}/analyze/line-message`, {
+        const response = await fetch(`${env.aiModuleUrl}/analyze/line-message`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -52,6 +54,8 @@ lineRouter.post("/webhook", lineWebhookMiddleware, async (req, res) => {
             timestamp: event.timestamp,
           }),
         });
+        const result = (await response.json()) as { tasks?: ConyNotedTask[] };
+        await replyAsCony(event.replyToken, result.tasks ?? []);
       }
 
       if (isTrackableFileMessage(event)) {
@@ -65,7 +69,7 @@ lineRouter.post("/webhook", lineWebhookMiddleware, async (req, res) => {
         for await (const chunk of stream) chunks.push(chunk as Buffer);
         const contentBase64 = Buffer.concat(chunks).toString("base64");
 
-        await fetch(`${env.aiModuleUrl}/analyze/line-file`, {
+        const response = await fetch(`${env.aiModuleUrl}/analyze/line-file`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -76,6 +80,8 @@ lineRouter.post("/webhook", lineWebhookMiddleware, async (req, res) => {
             timestamp: event.timestamp,
           }),
         });
+        const result = (await response.json()) as { tasks?: ConyNotedTask[] };
+        await replyAsCony(event.replyToken, result.tasks ?? []);
       }
     } catch (err) {
       console.error("Failed to process LINE event", err);
